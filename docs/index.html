@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>テロップカタログ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@800;900&family=BIZ+UDPGothic:wght@400;700&family=Source+Code+Pro:wght@500&display=swap">
+<style>
+/* 型録の台紙：上に絞り込みの帯（系統・NHK・検索）、下に系統ごとの段。カードは見本の動画＋名前＋NHK の区分＋写す一行 */
+:root {
+  --bg: #f2f4f7;
+  --panel: #ffffff;
+  --line: #d9dde5;
+  --fg: #16181d;
+  --muted: #5d6370;
+  --accent: #d0101c;
+  --code-bg: #eef0f4;
+  --use: #17723a; --use-bg: #dff3e5;
+  --ok: #0f5f99; --ok-bg: #dcecf8;
+  --no: #a2341a; --no-bg: #fbe3dc;
+  --tbd: #6a4aa6; --tbd-bg: #ece5f8;
+  --shadow: 0 1px 2px rgba(20, 24, 34, .06);
+  --f-display: "M PLUS 1p", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+  --f-body: "BIZ UDPGothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+  --f-mono: "Source Code Pro", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14161b; --panel: #1c1f26; --line: #2e333d; --fg: #eceef2; --muted: #a0a6b2; --accent: #ff4b52; --code-bg: #252932;
+    --use: #7ddc98; --use-bg: #1d3526; --ok: #7cc4ff; --ok-bg: #18303f; --no: #ff9f84; --no-bg: #3c231c; --tbd: #c8b0ff; --tbd-bg: #2c2440;
+    --shadow: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14161b; --panel: #1c1f26; --line: #2e333d; --fg: #eceef2; --muted: #a0a6b2; --accent: #ff4b52; --code-bg: #252932;
+  --use: #7ddc98; --use-bg: #1d3526; --ok: #7cc4ff; --ok-bg: #18303f; --no: #ff9f84; --no-bg: #3c231c; --tbd: #c8b0ff; --tbd-bg: #2c2440;
+  --shadow: none; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.7 var(--f-body); margin: 0; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+.pad { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.inner { max-width: 1240px; margin: 0 auto; }
+header.top { padding-block: 26px 14px; }
+h1 { font: 900 clamp(28px, 4.4vw, 42px)/1.2 var(--f-display); margin: 0 0 8px; text-wrap: balance; }
+h1 .n { color: var(--accent); }
+.lead { margin: 0; max-width: 66ch; color: var(--muted); }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--panel); border-block: 1px solid var(--line); padding-block: 10px; }
+.bar .inner { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 2px 11px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--panel); border-color: var(--fg); }
+.chip:focus-visible, select:focus-visible, input:focus-visible, .copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select, input[type=search] { font: inherit; font-size: 13.5px; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; }
+input[type=search] { width: 13em; max-width: 100%; }
+.count { margin-left: auto; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+main { padding-block: 22px 56px; }
+main .inner { display: grid; gap: 34px; }
+section.grp { display: grid; gap: 14px; }
+.grp-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; border-bottom: 2px solid var(--fg); padding-bottom: 5px; }
+.grp-head h2 { font: 900 21px/1.3 var(--f-display); margin: 0; }
+.grp-head span { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); min-width: 0; }
+.card video { display: block; width: 100%; max-width: 100%; aspect-ratio: 3 / 2; background: #10131c; object-fit: cover; }
+.body { padding: 10px 12px 12px; display: grid; gap: 6px; flex: 1; align-content: start; }
+.row1 { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.name { font: 500 14px/1.3 var(--f-mono); word-break: break-all; }
+.nhk { font-size: 11.5px; border-radius: 999px; padding: 0 8px; white-space: nowrap; }
+.nhk.use { color: var(--use); background: var(--use-bg); }
+.nhk.ok { color: var(--ok); background: var(--ok-bg); }
+.nhk.no { color: var(--no); background: var(--no-bg); }
+.nhk.tbd { color: var(--tbd); background: var(--tbd-bg); }
+.desc { font-size: 13.5px; }
+.meta { font-size: 12px; color: var(--muted); }
+.snip { display: flex; gap: 7px; align-items: stretch; margin-top: 2px; }
+.snip code { flex: 1; min-width: 0; font: 500 11.5px/1.5 var(--f-mono); background: var(--code-bg); border-radius: 6px; padding: 5px 7px; overflow-x: auto; white-space: nowrap; }
+.copy { font: 700 12px var(--f-body); border: 1px solid var(--accent); color: var(--accent); background: transparent; border-radius: 6px; padding: 0 9px; cursor: pointer; white-space: nowrap; }
+.copy:hover { background: var(--accent); color: var(--panel); }
+.empty { color: var(--muted); }
+footer { color: var(--muted); font-size: 12.5px; }
+@media (max-width: 640px) { .count { margin-left: 0; width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .card video { animation: none; } }
+</style>
+</head>
+<body>
+
+<header class="top pad">
+  <div class="inner">
+    <h1>テロップカタログ <span class="n" id="total"></span></h1>
+    <p class="lead">決めテロップ（文字ごと焼き込んだ動画）の型録。系統ごとに見本の動画・NHK 系で使えるか・spec の <code>fx</code> に写す一行を並べた。Claude Code に名前で頼むか、「写す」の一行を telops.json の <code>fx</code> に入れる（使い方は <a href="https://github.com/DarksideofNHK/telop-fx">リポジトリ</a>）。NHK の区分は、作者が NHK 系の動画で使うかどうかの使い分け。</p>
+  </div>
+</header>
+
+<div class="bar pad">
+  <div class="inner">
+    <div class="chips" id="chips" role="group" aria-label="系統で絞る"></div>
+    <select id="nhkSel" aria-label="NHK 系で絞る">
+      <option value="">NHK：全部</option>
+      <option value="use">NHK の候補だけ</option>
+      <option value="nhk">NHK で使えるもの（候補＋可）</option>
+      <option value="tbd">NHK は未決のもの</option>
+      <option value="no">NHK では使わないもの</option>
+    </select>
+    <input id="q" type="search" placeholder="名前・説明で探す" aria-label="名前・説明で探す">
+    <span class="count" id="count"></span>
+  </div>
+</div>
+
+<main class="pad">
+  <div class="inner" id="list"></div>
+</main>
+
+<footer class="pad"><div class="inner" id="foot"></div></footer>
+
+<script>
+const D = {"updated": "2026-11-07", "groups": [{"id": "kihon", "label": "基本"}, {"id": "glow", "label": "グロー系"}, {"id": "variety", "label": "バラエティの字幕型"}, {"id": "news", "label": "ニュース風"}, {"id": "kaiten", "label": "3D 回転"}, {"id": "quiz", "label": "クイズ"}, {"id": "parody", "label": "ニュース・情報番組（パロディ用）"}, {"id": "tokuban", "label": "選挙特番の題字（年ごと）"}, {"id": "gaitou", "label": "街頭インタビュー風"}], "nhk": {"use": "NHK の候補", "ok": "NHK でも可", "no": "NHK では使わない", "tbd": "NHK は未決"}, "cards": [{"id": "ikari", "desc": "怒り・告発", "group": "kihon", "nhk": "use", "style": "fuchi", "style_desc": "多重の縁（白抜き・色・白・黒）", "inn": "slam", "fx": "ikari"}, {"id": "odoroki", "desc": "驚き", "group": "kihon", "nhk": "no", "style": "gloss", "style_desc": "光沢（白い縁＋濃い縁＋グロー）", "inn": "tobidashi", "fx": "odoroki"}, {"id": "gimon", "desc": "疑問・あやしい", "group": "kihon", "nhk": "ok", "style": "neon", "style_desc": "ネオン（光る細い字）", "inn": "wave_in", "fx": "gimon"}, {"id": "suuji", "desc": "数字・金額", "group": "kihon", "nhk": "ok", "style": "kin", "style_desc": "金属（金・銀。折り返しのある照り）", "inn": "chars_drop", "fx": "suuji"}, {"id": "ketsuron", "desc": "結論・決め", "group": "kihon", "nhk": "ok", "style": "gloss", "style_desc": "光沢（白い縁＋濃い縁＋グロー）", "inn": "wipe_l", "fx": "ketsuron"}, {"id": "tsukkomi", "desc": "ツッコミ", "group": "kihon", "nhk": "no", "style": "beta", "style_desc": "べた＋立体の影（ポップ）", "inn": "pop", "fx": "tsukkomi"}, {"id": "kowai", "desc": "怖い・重い", "group": "kihon", "nhk": "ok", "style": "horror", "style_desc": "にじむ明朝（怖い話・重い話）", "inn": "blur_v", "fx": "kowai"}, {"id": "kirakira", "desc": "明るい・おどける", "group": "kihon", "nhk": "no", "style": "rainbow", "style_desc": "虹（1文字ずつ色違い）", "inn": "chars_pop", "fx": "kirakira"}, {"id": "sokuhou", "desc": "速報・見出し", "group": "kihon", "nhk": "ok", "style": "obi", "style_desc": "帯（斜めの色帯に白抜き）", "inn": "slide_l", "fx": "sokuhou"}, {"id": "bakuhatsu", "desc": "爆発・大声", "group": "kihon", "nhk": "ok", "style": "burst", "style_desc": "爆発（ギザギザの台座）", "inn": "tobidashi", "fx": "bakuhatsu"}, {"id": "honoo", "desc": "炎上・熱い", "group": "kihon", "nhk": "ok", "style": "fire", "style_desc": "炎（黄→橙→赤。青系の色なら氷）", "inn": "stretch_v", "fx": "honoo"}, {"id": "shizuka", "desc": "静かな決め", "group": "kihon", "nhk": "no", "style": "mincho", "style_desc": "白い明朝＋色のにじみ（静かな決め）", "inn": "glow", "fx": "shizuka"}, {"id": "gouka", "desc": "豪華・特別（金の明朝が左から光って出る）", "group": "glow", "nhk": "no", "style": "kinmin", "style_desc": "金の明朝（金の照り＋クリームの外縁＋金の光）", "inn": "glow_wipe_l", "fx": "gouka"}, {"id": "shoutai", "desc": "正体・暴露（光る明朝が中央から開く）", "group": "glow", "nhk": "no", "style": "hikari", "style_desc": "光る明朝（白い縁＋太い光る外縁。glow で光の色）", "inn": "glow_wipe_c", "fx": {"mood": "shoutai", "paint": {"が判明!": "b"}}}, {"id": "happyou", "desc": "発表（白い塊が飛び込んで着地）", "group": "glow", "nhk": "no", "style": "pop", "style_desc": "太いゴシック＋クリームの外縁＋黄色い光", "inn": "glow_slam", "fx": "happyou"}, {"id": "henshin", "desc": "変身・様変わり（右から滑り込む・紫の光）", "group": "glow", "nhk": "no", "style": "hikari", "style_desc": "光る明朝（白い縁＋太い光る外縁。glow で光の色）", "inn": "glow_slide_r", "fx": {"mood": "henshin", "paint": {"大変身!": "o"}}}, {"id": "kakumei", "desc": "新事実・ひっくり返る（左から滑り込む）", "group": "glow", "nhk": "no", "style": "shiromin", "style_desc": "白縁の明朝（白い縁＋白い光）", "inn": "glow_slide_l", "fx": {"mood": "kakumei", "paint": {"新事実": "r", "に": "k", "が!": "k"}}}, {"id": "shindoi", "desc": "苦労・小見出し（黄色い板が縦に伸びる）", "group": "glow", "nhk": "no", "style": "hako", "style_desc": "黄色い板に色の字（小見出し）", "inn": "glow_stretch_v", "fx": "shindoi"}, {"id": "tassei", "desc": "達成・クリア（床から跳ね上がる）", "group": "glow", "nhk": "no", "style": "pop", "style_desc": "太いゴシック＋クリームの外縁＋黄色い光", "inn": "glow_pop", "fx": "tassei"}, {"id": "taiketsu", "desc": "対決・幕開け（飛び込んで着地・右に回る。11-07 夜に点滅を外した）", "group": "glow", "nhk": "ok", "style": "shiromin", "style_desc": "白縁の明朝（白い縁＋白い光）", "inn": "slam", "fx": {"mood": "taiketsu", "paint": {"VS": "k", "会長": "p", "幕を開く!": "y"}}}, {"id": "shinjitsu", "desc": "真実・発表（飛び込んで着地・左に回る。11-07 夜に点滅を外した）", "group": "glow", "nhk": "ok", "style": "shiromin", "style_desc": "白縁の明朝（白い縁＋白い光）", "inn": "slam", "fx": {"mood": "shinjitsu", "paint": {"真実": "r"}}}, {"id": "jimaku", "desc": "字幕（話し手の色の縁・強調の語は paint）", "group": "variety", "nhk": "tbd", "style": "jimaku", "style_desc": "字幕（白い字＋黒い縁＋固い影。edge で話し手の色の縁）", "inn": "cut", "fx": {"mood": "jimaku", "paint": {"払う必要": "r"}}}, {"id": "honne", "desc": "本音の一言（大きな長体・白）", "group": "variety", "nhk": "tbd", "style": "dekai", "style_desc": "大きな長体（横を詰めた W9＋黒い縁）", "inn": "cut", "fx": "honne"}, {"id": "tsumeyori", "desc": "詰め寄る一言（大きな長体・赤）", "group": "variety", "nhk": "tbd", "style": "dekai", "style_desc": "大きな長体（横を詰めた W9＋黒い縁）", "inn": "cut", "fx": "tsumeyori"}, {"id": "kyouchou", "desc": "目立たせる一言（白い縁＋濃い外縁・橙）", "group": "variety", "nhk": "tbd", "style": "tsuyo", "style_desc": "強調（淡い色の字＋白い縁＋濃い外縁）", "inn": "cut", "fx": "kyouchou"}, {"id": "dokuhaku", "desc": "独白・迫る問い（劇画の明朝）", "group": "variety", "nhk": "tbd", "style": "geki", "style_desc": "劇画の明朝（縦長の明朝＋黒い縁）", "inn": "cut", "fx": "dokuhaku"}, {"id": "narration", "desc": "ナレーション・心の声（黄色い枠の板）", "group": "variety", "nhk": "tbd", "style": "waku", "style_desc": "枠の板（黄色い太枠の黄緑の板）", "inn": "cut", "fx": "narration"}, {"id": "midashi", "desc": "企画の見出し（水色の板・2行目を赤に）", "group": "variety", "nhk": "tbd", "style": "waku_ao", "style_desc": "見出しの板（黄色い太枠の水色の板）", "inn": "cut", "fx": "midashi"}, {"id": "bara_mix", "desc": "大小と色を混ぜた字幕（語ごとに paint と size_words）", "group": "variety", "nhk": "tbd", "style": "bara", "style_desc": "バラエティの字幕（黒＝青い光・青赤＝白からのグラデ・黄橙ピンク＝べた）", "inn": "cut", "fx": {"mood": "bara_mix", "paint": {"正直": "p"}, "size_words": {"正直": 0.72}}}, {"id": "shuchou", "desc": "主張の札（紫の名前のタブ tag＋緑に光る六角の板・2行目は黄）", "group": "variety", "nhk": "tbd", "style": "shuchou", "style_desc": "主張の札（黒紫の六角の板＋緑の縁＋紫の名前のタブ）", "inn": "pop", "fx": {"mood": "shuchou", "tag": "視聴者 Aさん"}}, {"id": "nafuda", "desc": "出演者の名札（両端のとがった色の札・前の小さい語は size_words）", "group": "variety", "nhk": "tbd", "style": "nafuda", "style_desc": "出演者の名札（両端のとがった色の札）", "inn": "cut", "fx": {"mood": "nafuda", "size_words": {"視聴者": 0.62}}}, {"id": "gaitou_aka", "desc": "言い切りの一言（色の太明朝・赤）", "group": "gaitou", "nhk": "tbd", "style": "gaitou", "style_desc": "色の太明朝（色のグラデ＋白い縁＋濃い外縁＋厚み。白は黒い縁）", "inn": "cut", "fx": "gaitou_aka"}, {"id": "gaitou_ao", "desc": "しくじった一言（色の太明朝・青）", "group": "gaitou", "nhk": "tbd", "style": "gaitou", "style_desc": "色の太明朝（色のグラデ＋白い縁＋濃い外縁＋厚み。白は黒い縁）", "inn": "cut", "fx": "gaitou_ao"}, {"id": "gaitou_shiro", "desc": "本音の一言（白い太ゴシック＋黒い縁）", "group": "gaitou", "nhk": "tbd", "style": "gaitou_go", "style_desc": "太いゴシック（白い字＋黒い太縁＋黒いにじみ。色の字は太明朝と同じ重ね）", "inn": "cut", "fx": "gaitou_shiro"}, {"id": "gaitou_mix", "desc": "要の語だけ色の一言（白い太ゴシックの中の語を paint で紫に）", "group": "gaitou", "nhk": "tbd", "style": "gaitou_go", "style_desc": "太いゴシック（白い字＋黒い太縁＋黒いにじみ。色の字は太明朝と同じ重ね）", "inn": "cut", "fx": {"mood": "gaitou_mix", "paint": {"契約": "v"}}}, {"id": "gaitou_futairo", "desc": "2色の一言（前半と後半で色を替える・paint）", "group": "gaitou", "nhk": "tbd", "style": "gaitou", "style_desc": "色の太明朝（色のグラデ＋白い縁＋濃い外縁＋厚み。白は黒い縁）", "inn": "cut", "fx": {"mood": "gaitou_futairo", "paint": {"若者": "o"}}}, {"id": "gaitou_sub", "desc": "話し言葉の字幕（色の字＋同じ色の光）", "group": "gaitou", "nhk": "tbd", "style": "gaitou_sub", "style_desc": "話し言葉の字幕（色の字＋白い細縁＋同じ色の光。白い字は edge の色）", "inn": "cut", "fx": "gaitou_sub"}, {"id": "gaitou_sub_w", "desc": "話し言葉の字幕・白（edge の色の縁と光・既定は青）", "group": "gaitou", "nhk": "tbd", "style": "gaitou_sub", "style_desc": "話し言葉の字幕（色の字＋白い細縁＋同じ色の光。白い字は edge の色）", "inn": "cut", "fx": "gaitou_sub_w"}, {"id": "gaitou_staff", "desc": "スタッフの問い＋答え（黒い札 tag・1行目は小さく白・2行目は黄）", "group": "gaitou", "nhk": "tbd", "style": "gaitou_staff", "style_desc": "スタッフの問い（白い小さな字・黒い札は tag・答えの行は黄）", "inn": "cut", "fx": {"mood": "gaitou_staff", "tag": "スタッフ"}}, {"id": "gaitou_obi", "desc": "「〜騒動」の見出し（紺の帯に黄色い太字）", "group": "gaitou", "nhk": "tbd", "style": "gaitou_obi", "style_desc": "紺の帯の見出し（横いっぱいの紺の帯に黄色い太字）", "inn": "cut", "fx": "gaitou_obi"}, {"id": "gaitou_q", "desc": "問いの板（Q.〜は？・要の語は赤）", "group": "gaitou", "nhk": "tbd", "style": "gaitou_q", "style_desc": "問いの板（白い角丸の板に黒い字・要の語は赤）", "inn": "cut", "fx": {"mood": "gaitou_q", "paint": {"使い道": "r"}}}, {"id": "gaitou_kado", "desc": "1字ずつの箱の題名（企画名・要の語は黄緑の箱）", "group": "gaitou", "nhk": "tbd", "style": "gaitou_kado", "style_desc": "1字ずつの箱の題名（黒い帯の上に白い箱・要の語は黄緑の箱）", "inn": "cut", "fx": {"mood": "gaitou_kado", "paint": {"受信料の本音": "g"}}}, {"id": "tatefuda", "desc": "縦の札（写真の横に「実際の○○」・既定は左の端・align r で右）", "group": "gaitou", "nhk": "tbd", "style": "tatefuda", "style_desc": "縦の札（色の板に白い縦書き・写真の横に「実際の○○」）", "inn": "cut", "fx": "tatefuda"}, {"id": "sokuho_flash", "desc": "速報の字（画面の上に2行・白い字＋黒い太縁）", "group": "parody", "nhk": "use", "style": "news_flash", "style_desc": "速報の字（白い字＋黒い太縁＋落ち影）", "inn": "cut", "fx": "sokuho_flash"}, {"id": "sokuho_head", "desc": "速報の見出し（「ニュース速報」＋上下の線）", "group": "parody", "nhk": "use", "style": "news_flash_head", "style_desc": "速報の見出し（斜めの白い字＋上下の2本の線）", "inn": "cut", "fx": "sokuho_head"}, {"id": "news_head", "desc": "ニュースの見出しの帯（白い帯・要の語は赤・青いタブは tag）", "group": "parody", "nhk": "use", "style": "news_head", "style_desc": "ニュースの見出しの帯（白い帯＋青い縁・青いタブ）", "inn": "cut", "fx": {"mood": "news_head", "paint": {"元職員が解説": "r"}, "tag": "元NHK職員"}}, {"id": "news_cap", "desc": "ニュースの字幕の帯（暗い帯に白い字・青い札 tag と白い札 tag2）", "group": "parody", "nhk": "use", "style": "news_cap", "style_desc": "ニュースの字幕の帯（半透明の暗い帯・青い札と白い札）", "inn": "cut", "fx": {"mood": "news_cap", "tag": "元NHK職員", "tag2": "解説"}}, {"id": "news_corner", "desc": "右上の札（白い板・2行目は赤・右寄せ）", "group": "parody", "nhk": "use", "style": "news_corner", "style_desc": "右上の札（白い板に黒と赤の字）", "inn": "cut", "fx": "news_corner"}, {"id": "news_basho", "desc": "場所の札（黒い板に白い字・右寄せ）", "group": "parody", "nhk": "use", "style": "news_basho", "style_desc": "場所の札（黒い板に白い字）", "inn": "cut", "fx": "news_basho"}, {"id": "kaisetsu", "desc": "解説番組の見出し（行ごとの斜めの帯・星形の札は tag）", "group": "parody", "nhk": "use", "style": "kaisetsu", "style_desc": "解説番組の見出し（行ごとの斜めの帯＋星形の札）", "inn": "cut", "fx": {"mood": "kaisetsu", "tag": "緊急解説", "paint": {"ギモン": "r"}}}, {"id": "jouhou_title", "desc": "朝の情報番組の題名（ピンクの縁の白い札・要の語は赤）", "group": "parody", "nhk": "use", "style": "jouhou_title", "style_desc": "朝の情報番組の題名（ピンクの縁の白い札）", "inn": "cut", "fx": {"mood": "jouhou_title", "paint": {"素朴なギモン": "r"}}}, {"id": "jouhou_name", "desc": "朝の情報番組の名前の札（ピンクのタブ tag＝所属・色の縦じま）", "group": "parody", "nhk": "use", "style": "jouhou_name", "style_desc": "朝の情報番組の名前の札（ピンクのタブ＋色の縦じま）", "inn": "cut", "fx": {"mood": "jouhou_name", "tag": "解説"}}, {"id": "kaisan_2005", "desc": "選挙特番の題字 2005 年の作り（NHK の衆議院解散の題字）", "group": "tokuban", "nhk": "use", "style": "tokuban_2005", "style_desc": "選挙特番の題字 2005（銀のゴシック＋立体の影）", "inn": "pop", "fx": "kaisan_2005"}, {"id": "kaisan_2009", "desc": "選挙特番の題字 2009 年の作り（NHK の衆議院解散の題字）", "group": "tokuban", "nhk": "use", "style": "tokuban_2009", "style_desc": "選挙特番の題字 2009（金の太いゴシック＋黒い厚み）", "inn": "pop", "fx": "kaisan_2009"}, {"id": "kaisan_2012", "desc": "選挙特番の題字 2012 年の作り（NHK の衆議院解散の題字）", "group": "tokuban", "nhk": "use", "style": "tokuban_2012", "style_desc": "選挙特番の題字 2012（明るい金・字の間を広く）", "inn": "pop", "fx": "kaisan_2012"}, {"id": "kaisan_2014", "desc": "選挙特番の題字 2014 年の作り（NHK の衆議院解散の題字）", "group": "tokuban", "nhk": "use", "style": "tokuban_2014", "style_desc": "選挙特番の題字 2014（黄白のグラデ＋紺と白の縁＋青い光）", "inn": "pop", "fx": "kaisan_2014"}, {"id": "kaisan_2017", "desc": "選挙特番の題字 2017 年の作り（NHK の衆議院解散の題字）", "group": "tokuban", "nhk": "use", "style": "tokuban_2017", "style_desc": "選挙特番の題字 2017（金の太い明朝＋濃い厚み）", "inn": "pop", "fx": "kaisan_2017"}, {"id": "kaisan_2021", "desc": "選挙特番の題字 2021 年の作り（NHK の衆議院解散の題字）", "group": "tokuban", "nhk": "use", "style": "tokuban_2021", "style_desc": "選挙特番の題字 2021（金の太い明朝＋青緑の光）", "inn": "pop", "fx": "kaisan_2021"}, {"id": "kaisan_2024", "desc": "選挙特番の題字 2024 年の作り（NHK の衆議院解散の題字）", "group": "tokuban", "nhk": "use", "style": "tokuban_2024", "style_desc": "選挙特番の題字 2024（白から金の細めの明朝＋金の厚み）", "inn": "pop", "fx": "kaisan_2024"}, {"id": "kaisan_2026", "desc": "選挙特番の題字 2026 年の作り（NHK の衆議院解散の題字）", "group": "tokuban", "nhk": "use", "style": "tokuban_2026", "style_desc": "選挙特番の題字 2026（金の明朝＋赤い縁＋赤い光）", "inn": "pop", "fx": "kaisan_2026"}, {"id": "news_jimaku", "desc": "インタビュー字幕（白い字＋話し手の色の縁・要の語は箱か色の字）", "group": "news", "nhk": "tbd", "style": "news_jimaku", "style_desc": "ニュースの字幕（白い字＋話し手の色の縁。edge）", "inn": "cut", "fx": {"mood": "news_jimaku", "box_words": {"受信料": "r"}, "paint": {"毎月": "y"}}}, {"id": "news_obi", "desc": "見出しの帯（横いっぱいの帯がぶれて入る・左上の札は tag）", "group": "news", "nhk": "tbd", "style": "news_obi", "style_desc": "ニュースの見出しの帯（横いっぱいの帯。edge で帯の色・tag で札）", "inn": "news_swipe", "fx": {"mood": "news_obi", "paint": {"受信料": "y"}, "tag": "妻"}}, {"id": "news_kyouchou", "desc": "大きな強調（濃い字＋白い太縁）", "group": "news", "nhk": "tbd", "style": "news_tsuyo", "style_desc": "ニュースの強調（濃い字＋白い太縁）", "inn": "cut", "fx": "news_kyouchou"}, {"id": "news_fuda", "desc": "情報の札（白い板＋色の字・上のタブは tag）", "group": "news", "nhk": "tbd", "style": "news_fuda", "style_desc": "ニュースの情報の札（白い板＋色の字・tag でタブ）", "inn": "cut", "fx": {"mood": "news_fuda", "tag": "受信料"}}, {"id": "kaiten_tate", "desc": "3D 回転・縦の柱（面ごとに縦書き。「気づく？→気づかない？」）", "group": "kaiten", "nhk": "use", "style": "kaiten", "style_desc": "3D 回転（金の枠の柱が回って面ごとに字。行＝面）", "inn": "kaiten_in", "fx": "kaiten_tate"}, {"id": "kaiten_yoko", "desc": "3D 回転・横の帯（転がって次の面）", "group": "kaiten", "nhk": "use", "style": "kaiten", "style_desc": "3D 回転（金の枠の柱が回って面ごとに字。行＝面）", "inn": "kaiten_in", "fx": "kaiten_yoko"}, {"id": "kaiten_gin", "desc": "3D 回転・銀の枠の横の帯（ニュース・解説向き）", "group": "kaiten", "nhk": "use", "style": "kaiten", "style_desc": "3D 回転（金の枠の柱が回って面ごとに字。行＝面）", "inn": "kaiten_in", "fx": "kaiten_gin"}, {"id": "kaiten_pop", "desc": "3D 回転・白い枠の縦の柱（明るいクイズ）", "group": "kaiten", "nhk": "use", "style": "kaiten", "style_desc": "3D 回転（金の枠の柱が回って面ごとに字。行＝面）", "inn": "kaiten_in", "fx": "kaiten_pop"}, {"id": "yontaku", "desc": "4択クイズ（青く光る縁・選択肢が順に出る・answer で正解が緑に）", "group": "quiz", "nhk": "tbd", "style": "yontaku", "style_desc": "4択パネル（光る縁の六角の板。1行目＝問題・2行目から選択肢）", "inn": "panel_in", "fx": {"mood": "yontaku", "pick": "C", "answer": "A"}}, {"id": "yontaku_kin", "desc": "4択クイズ・金の縁（豪華・決勝）", "group": "quiz", "nhk": "tbd", "style": "yontaku", "style_desc": "4択パネル（光る縁の六角の板。1行目＝問題・2行目から選択肢）", "inn": "panel_in", "fx": {"mood": "yontaku_kin", "answer": "A"}}, {"id": "mondai", "desc": "問題の板だけ（光る縁の六角の板に問い）", "group": "quiz", "nhk": "tbd", "style": "yontaku", "style_desc": "4択パネル（光る縁の六角の板。1行目＝問題・2行目から選択肢）", "inn": "panel_in", "fx": "mondai"}, {"id": "yontaku_nhk", "desc": "4択クイズ・NHK 版（紺の板＋黄の縁・正解は黄に）", "group": "quiz", "nhk": "use", "style": "yontaku", "style_desc": "4択パネル（光る縁の六角の板。1行目＝問題・2行目から選択肢）", "inn": "panel_in", "fx": {"mood": "yontaku_nhk", "pick": "B", "answer": "A"}}, {"id": "mondai_nhk", "desc": "問題の板だけ・NHK 版（紺＋黄）", "group": "quiz", "nhk": "use", "style": "yontaku", "style_desc": "4択パネル（光る縁の六角の板。1行目＝問題・2行目から選択肢）", "inn": "panel_in", "fx": "mondai_nhk"}, {"id": "kaisan_2005_r", "desc": "選挙特番の題字の色違い：2005・赤の金属", "group": "tokuban", "nhk": "use", "style": "tokuban_2005", "style_desc": "選挙特番の題字 2005（銀のゴシック＋立体の影）", "inn": "pop", "fx": {"mood": "kaisan_2005", "tint": "r"}}, {"id": "kaisan_2005_b", "desc": "選挙特番の題字の色違い：2005・青の金属", "group": "tokuban", "nhk": "use", "style": "tokuban_2005", "style_desc": "選挙特番の題字 2005（銀のゴシック＋立体の影）", "inn": "pop", "fx": {"mood": "kaisan_2005", "tint": "b"}}, {"id": "kaisan_2009_w", "desc": "選挙特番の題字の色違い：2009・銀", "group": "tokuban", "nhk": "use", "style": "tokuban_2009", "style_desc": "選挙特番の題字 2009（金の太いゴシック＋黒い厚み）", "inn": "pop", "fx": {"mood": "kaisan_2009", "tint": "w"}}, {"id": "kaisan_2009_b_metal", "desc": "選挙特番の題字の色違い：2009・青の金属", "group": "tokuban", "nhk": "use", "style": "tokuban_2009", "style_desc": "選挙特番の題字 2009（金の太いゴシック＋黒い厚み）", "inn": "pop", "fx": {"mood": "kaisan_2009", "tint": "b", "metal": true}}, {"id": "kaisan_2012_r", "desc": "選挙特番の題字の色違い：2012・金＋赤い光", "group": "tokuban", "nhk": "use", "style": "tokuban_2012", "style_desc": "選挙特番の題字 2012（明るい金・字の間を広く）", "inn": "pop", "fx": {"mood": "kaisan_2012", "tint": "r"}}, {"id": "kaisan_2012_w", "desc": "選挙特番の題字の色違い：2012・銀", "group": "tokuban", "nhk": "use", "style": "tokuban_2012", "style_desc": "選挙特番の題字 2012（明るい金・字の間を広く）", "inn": "pop", "fx": {"mood": "kaisan_2012", "tint": "w"}}, {"id": "kaisan_2014_g", "desc": "選挙特番の題字の色違い：2014・緑の縁と光", "group": "tokuban", "nhk": "use", "style": "tokuban_2014", "style_desc": "選挙特番の題字 2014（黄白のグラデ＋紺と白の縁＋青い光）", "inn": "pop", "fx": {"mood": "kaisan_2014", "tint": "g"}}, {"id": "kaisan_2014_p", "desc": "選挙特番の題字の色違い：2014・ピンクの縁と光", "group": "tokuban", "nhk": "use", "style": "tokuban_2014", "style_desc": "選挙特番の題字 2014（黄白のグラデ＋紺と白の縁＋青い光）", "inn": "pop", "fx": {"mood": "kaisan_2014", "tint": "p"}}, {"id": "kaisan_2017_w", "desc": "選挙特番の題字の色違い：2017・銀の明朝", "group": "tokuban", "nhk": "use", "style": "tokuban_2017", "style_desc": "選挙特番の題字 2017（金の太い明朝＋濃い厚み）", "inn": "pop", "fx": {"mood": "kaisan_2017", "tint": "w"}}, {"id": "kaisan_2017_p_metal", "desc": "選挙特番の題字の色違い：2017・ピンクの金属", "group": "tokuban", "nhk": "use", "style": "tokuban_2017", "style_desc": "選挙特番の題字 2017（金の太い明朝＋濃い厚み）", "inn": "pop", "fx": {"mood": "kaisan_2017", "tint": "p", "metal": true}}, {"id": "kaisan_2021_v", "desc": "選挙特番の題字の色違い：2021・金＋紫の光", "group": "tokuban", "nhk": "use", "style": "tokuban_2021", "style_desc": "選挙特番の題字 2021（金の太い明朝＋青緑の光）", "inn": "pop", "fx": {"mood": "kaisan_2021", "tint": "v"}}, {"id": "kaisan_2021_g_metal", "desc": "選挙特番の題字の色違い：2021・緑の金属", "group": "tokuban", "nhk": "use", "style": "tokuban_2021", "style_desc": "選挙特番の題字 2021（金の太い明朝＋青緑の光）", "inn": "pop", "fx": {"mood": "kaisan_2021", "tint": "g", "metal": true}}, {"id": "kaisan_2024_c_metal", "desc": "選挙特番の題字の色違い：2024・水色の金属", "group": "tokuban", "nhk": "use", "style": "tokuban_2024", "style_desc": "選挙特番の題字 2024（白から金の細めの明朝＋金の厚み）", "inn": "pop", "fx": {"mood": "kaisan_2024", "tint": "c", "metal": true}}, {"id": "kaisan_2024_k_metal", "desc": "選挙特番の題字の色違い：2024・黒の金属", "group": "tokuban", "nhk": "use", "style": "tokuban_2024", "style_desc": "選挙特番の題字 2024（白から金の細めの明朝＋金の厚み）", "inn": "pop", "fx": {"mood": "kaisan_2024", "tint": "k", "metal": true}}, {"id": "kaisan_2026_b", "desc": "選挙特番の題字の色違い：2026・青い縁と光", "group": "tokuban", "nhk": "use", "style": "tokuban_2026", "style_desc": "選挙特番の題字 2026（金の明朝＋赤い縁＋赤い光）", "inn": "pop", "fx": {"mood": "kaisan_2026", "tint": "b"}}, {"id": "kaisan_2026_r_metal", "desc": "選挙特番の題字の色違い：2026・赤の金属", "group": "tokuban", "nhk": "use", "style": "tokuban_2026", "style_desc": "選挙特番の題字 2026（金の明朝＋赤い縁＋赤い光）", "inn": "pop", "fx": {"mood": "kaisan_2026", "tint": "r", "metal": true}}, {"id": "kaisan_2026_w", "desc": "選挙特番の題字の色違い：2026・銀＋灰の縁", "group": "tokuban", "nhk": "use", "style": "tokuban_2026", "style_desc": "選挙特番の題字 2026（金の明朝＋赤い縁＋赤い光）", "inn": "pop", "fx": {"mood": "kaisan_2026", "tint": "w"}}]};
+let group = '';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const line = c => `"fx": ${JSON.stringify(c.fx)}`;
+$('#total').textContent = `${D.cards.length}枚`;
+$('#foot').textContent = `${D.updated} 更新。見本の文は一般的な言い回しで、実在の人の発言や本物のニュースではない。`;
+function chips() {
+  const all = [{id: '', label: 'すべて'}].concat(D.groups);
+  $('#chips').innerHTML = all.map(g => `<button class="chip" type="button" data-g="${g.id}" aria-pressed="${g.id === group}">${esc(g.label)}</button>`).join('');
+}
+function match(c) {
+  const n = $('#nhkSel').value, q = $('#q').value.trim();
+  if (group && c.group !== group) return false;
+  if (n === 'nhk' && !(c.nhk === 'use' || c.nhk === 'ok')) return false;
+  if (n && n !== 'nhk' && c.nhk !== n) return false;
+  if (q && !(c.id + c.desc + c.style_desc).includes(q)) return false;
+  return true;
+}
+function render() {
+  const shown = D.cards.filter(match);
+  $('#count').textContent = `${shown.length} / ${D.cards.length} 枚`;
+  const html = D.groups.map(g => {
+    const cs = shown.filter(c => c.group === g.id);
+    if (!cs.length) return '';
+    return `<section class="grp" aria-label="${esc(g.label)}">
+      <div class="grp-head"><h2>${esc(g.label)}</h2><span>${cs.length}枚</span></div>
+      <div class="cards">${cs.map(c => `
+        <article class="card">
+          <video src="m/${esc(c.id)}.mp4" poster="m/${esc(c.id)}.png" muted loop playsinline autoplay preload="none" aria-label="${esc(c.id)} の見本"></video>
+          <div class="body">
+            <div class="row1"><span class="name">${esc(c.id)}</span><span class="nhk ${c.nhk}">${esc(D.nhk[c.nhk] || '')}</span></div>
+            <div class="desc">${esc(c.desc)}</div>
+            <div class="meta">型 ${esc(c.style)}（${esc(c.style_desc)}）・出方 ${esc(c.inn)}</div>
+            <div class="snip"><code>${esc(line(c))}</code><button class="copy" type="button" data-id="${esc(c.id)}">写す</button></div>
+          </div>
+        </article>`).join('')}</div></section>`;
+  }).join('');
+  $('#list').innerHTML = html || '<p class="empty">当てはまるものがない。絞り込みを外してください。</p>';
+  watch();
+}
+let io;
+function watch() {          // 見えているカードの動画だけ再生する（90本を一度に回さない）
+  if (io) io.disconnect();
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
+    const v = e.target;
+    if (e.isIntersecting && !reduce) { v.play().catch(() => {}); } else { v.pause(); }
+  }), {rootMargin: '200px'}) : null;
+  document.querySelectorAll('.card video').forEach(v => { v.removeAttribute('autoplay'); if (io) io.observe(v); });
+}
+$('#chips').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  group = b.dataset.g; chips(); render();
+});
+$('#nhkSel').addEventListener('change', render);
+$('#q').addEventListener('input', render);
+document.addEventListener('click', async e => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const c = D.cards.find(x => x.id === b.dataset.id), t = line(c);
+  try { await navigator.clipboard.writeText(t); b.textContent = '写した'; }
+  catch (_) { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = '選んだ'; }
+  setTimeout(() => { b.textContent = '写す'; }, 1600);
+});
+chips(); render();
+</script>
+
+</body>
+</html>

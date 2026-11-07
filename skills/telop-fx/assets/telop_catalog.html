@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>テロップカタログ</title>
+<!-- premiere-short-xml の telop_fx.py cards が catalog// に写す。データは同じフォルダの catalog.js -->
+<script src="catalog.js"></script>
+<style>
+:root{--bg:#16171a;--panel:#1f2125;--panel2:#272a2f;--line:#34373d;--text:#e9e9ec;--muted:#9a9ca3;--accent:#ffd84a;
+  --use:#7bd88f;--ok:#5ec2ff;--no:#ff8a5c;--tbd:#c9a8ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 "Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif}
+header{position:sticky;top:0;z-index:3;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+h1{font-size:16px;margin:0 8px 0 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:3px 12px;cursor:pointer;color:var(--muted);font:inherit}
+.chip.on{background:#3a3420;border-color:var(--accent);color:var(--accent)}
+select,input{background:#121316;border:1px solid var(--line);border-radius:6px;padding:4px 8px;color:inherit;font:inherit}
+.count{color:var(--muted);font-size:12px;margin-left:auto}
+.note{color:var(--muted);font-size:12.5px;padding:8px 16px 0;max-width:1200px}
+.note b{color:var(--text)}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;padding:14px 16px 40px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.card video{width:100%;aspect-ratio:3/2;display:block;background:#000}
+.body{padding:9px 11px 11px;display:flex;flex-direction:column;gap:5px;flex:1}
+.top{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.name{font-weight:700;font-size:15px;font-family:ui-monospace,Menlo,monospace}
+.desc{font-size:13px}
+.badge{font-size:11px;border-radius:99px;padding:0 8px;border:1px solid currentColor}
+.b-use{color:var(--use)}.b-ok{color:var(--ok)}.b-no{color:var(--no)}.b-tbd{color:var(--tbd)}
+.grp{color:var(--muted)}
+.meta{font-size:11.5px;color:var(--muted)}
+.copy{margin-top:auto;align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:3px 10px;color:inherit;font:inherit;font-size:12.5px;cursor:pointer}
+.copy:hover{border-color:var(--accent)}
+code{font-size:11.5px;color:#d7d9de;word-break:break-all}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2b3a2e;color:#cfeed6;border:1px solid #3f6b4a;padding:6px 14px;border-radius:8px;display:none;z-index:9}
+.empty{color:var(--muted);padding:30px 16px}
+@media (max-width:600px){header{padding:8px 12px;position:static}#grid{padding:12px;grid-template-columns:1fr}.count{margin-left:0}}
+</style>
+</head>
+<body>
+<header>
+  <h1>テロップカタログ</h1>
+  <div class="chips" id="groups"></div>
+  <select id="nhk">
+    <option value="">NHK：全部見る</option>
+    <option value="nhk">NHK で使えるものだけ</option>
+    <option value="use">NHK の候補だけ</option>
+  </select>
+  <input id="q" type="search" placeholder="名前・説明で探す">
+  <span class="count" id="count"></span>
+</header>
+<p class="note">決めテロップ（文字ごと焼き込んだ動画）の気分の一覧。<b>選び方</b>：編集画面（short-edit）の各テロップの「決めテロップ」から選ぶか、Claude に名前（例 <code>honne</code>）を伝える。spec に直接書くときは「写す」で一行をコピーする。<b>色</b>は spec の行の色がそのまま型の色になる（見本の色は一例）。行の中の一部だけ色を替えるのは <code>paint</code>、話し手の色の縁・帯や札の色は <code>edge</code>、帯の札やタブの文字は <code>tag</code>、語を色の箱に入れるのは <code>box_words</code>（ニュース風）。</p>
+<div id="grid"></div>
+<div id="toast"></div>
+<script>
+const D = window.TELOP_CATALOG || {cards: [], groups: [], nhk_labels: {}};
+let group = '';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+function chips() {
+  const all = [{id: '', label: 'すべて'}].concat(D.groups);
+  $('#groups').innerHTML = all.map(g => `<button class="chip ${g.id === group ? 'on' : ''}" data-g="${g.id}">${esc(g.label)}</button>`).join('');
+  document.querySelectorAll('.chip').forEach(b => b.onclick = () => { group = b.dataset.g; chips(); render(); });
+}
+function line(c) { return `"fx": ${JSON.stringify(c.snippet.fx)}`; }
+function render() {
+  const nhk = $('#nhk').value, q = $('#q').value.trim();
+  const gl = Object.fromEntries(D.groups.map(g => [g.id, g.label]));
+  const list = D.cards.filter(c => (!group || c.group === group)
+    && (!nhk || (nhk === 'use' ? c.nhk === 'use' : (c.nhk === 'use' || c.nhk === 'ok')))
+    && (!q || (c.id + c.desc + c.style_desc + c.sample.join('')).includes(q)));
+  $('#count').textContent = `${list.length} / ${D.cards.length} 件` + (D.updated ? `（${D.updated} 更新）` : '');
+  $('#grid').innerHTML = list.length ? list.map(c => `<div class="card">
+    <video src="${esc(c.clip)}" poster="${esc(c.poster)}" muted loop playsinline autoplay preload="metadata"></video>
+    <div class="body">
+      <div class="top"><span class="name">${esc(c.id)}</span><span class="badge b-${c.nhk}">${esc(D.nhk_labels[c.nhk] || '')}</span><span class="grp">${esc(gl[c.group] || '')}</span></div>
+      <div class="desc">${esc(c.desc)}</div>
+      <div class="meta">型 ${esc(c.style)}（${esc(c.style_desc)}）・出方 ${esc(c['in'])}・出ている間 ${esc(c.hold)}</div>
+      <code>${esc(line(c))}</code>
+      <button class="copy" data-id="${esc(c.id)}">写す</button>
+    </div></div>`).join('') : '<div class="empty">当てはまるものがない</div>';
+  document.querySelectorAll('.copy').forEach(b => b.onclick = async () => {
+    const c = D.cards.find(x => x.id === b.dataset.id), t = line(c);
+    try { await navigator.clipboard.writeText(t); toast('写しました：' + t); } catch (e) { toast(t); }
+  });
+}
+function toast(t) { const el = $('#toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(() => el.style.display = 'none', 2600); }
+$('#nhk').onchange = render; $('#q').oninput = render;
+chips(); render();
+</script>
+</body>
+</html>
