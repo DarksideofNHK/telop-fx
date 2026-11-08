@@ -922,6 +922,25 @@ def st_chi_obi(C, key):
     return dict(font='W8', fill=[(0, T_), (1, T_)], plate=dict(kind='drip', fill=(214, 0, 8), pad=(.6, .32)))
 
 
+# ---- キャンディの丸ゴシック（2026-11-09。ユーザーのチャンネルのバナーの題字の作り）：太らせた丸ゴシックの白い字（要の語はピンク）＋つやの点
+#      ＋紺の太縁＋水色の厚み＋紺の底。candy_glitch はまわりにピンクと水色のグリッチの線（台座 kind glitch）
+_CD_NAVY, _CD_TEAL = (28, 20, 56), (52, 226, 200)
+
+
+def st_candy(C, key):
+    """キャンディの丸ゴシック：白（ほんのり桃色）かピンクの字＋つやの点（gloss_dots）＋紺の太縁＋水色の厚み＋紺の底"""
+    F = ([(0, (255, 92, 152)), (1, (234, 28, 108))] if key == 'p' else [(0, (255, 252, 254)), (1, (244, 224, 236))] if key in ('w', 'k')
+         else [(0, lighten(C, .2)), (1, darken(C, .1))])
+    dot = WHITE if key not in ('w', 'k') else (255, 160, 196)
+    return dict(font='maru', bold=.05, track=.03, layers=[dict(w=.2, color=_CD_NAVY)], fill=F, gloss_dots=dot,
+                extrude=dict(dx=0, dy=.12, color=_CD_TEAL), shadow=dict(dx=0, dy=.19, blur=.004, a=1.0, color=_CD_NAVY))
+
+
+def st_candy_g(C, key):
+    """キャンディの丸ゴシック＋グリッチの線（まわりにピンク・水色・白の横の線）"""
+    return dict(st_candy(C, key), plate=dict(kind='glitch', pad=(1.2, .7), no_sil=True))
+
+
 def st_doc(C, key):
     """ドキュメンタリー番組の題字（2026-11-08。大型ドキュメンタリーのタイトルの作りの族）：白い明朝＋暗いにじみ（光らせない＝白い光は読めない 11-07）。
     肩書き（上の小さい行）・副題（下の「〜…〜」）は fx の sizes（行ごとの大きさ）と fonts（行ごとの書体）で"""
@@ -1097,6 +1116,8 @@ STYLES = {
     'hako_moji': ('1字ずつの色の箱（白い字・黒い厚み）', st_hako_moji),
     'amecomi': ('アメコミ風（黄→橙→ピンクの斜めの字＋黒白黒の縁）', st_amecomi),
     'kowaji': ('怖い字（血の赤の太い明朝・ふちの崩しは rough）', st_kowaji),
+    'candy': ('キャンディの丸ゴシック（白かピンク・つやの点・紺の縁・水色の厚み）', st_candy),
+    'candy_g': ('キャンディの丸ゴシック＋グリッチの線', st_candy_g),
     'chi_obi': ('血の帯（したたる赤い帯に黒い字）', st_chi_obi),
     'touron_jimaku': ('討論の字幕（半透明の暗い箱に白い太字）', st_touron_jimaku),
     'touron_midashi': ('右上の話題の見出し（白い帯に黒い明朝・茶色の線）', st_touron_midashi),
@@ -1788,6 +1809,8 @@ MOODS = {
     'kyoufu': ('恐怖感（ふちがギザギザの血の赤の明朝）', dict(style='kowaji', **{'in': 'cut'}, hold='none', color='r', rough='kyoufu', big=True)),
     'togetoge': ('トゲトゲ感（ふちからトゲが生えた血の赤の明朝）', dict(style='kowaji', **{'in': 'cut'}, hold='none', color='r', rough='toge', big=True)),
     'chi_obi': ('血の帯（したたる赤い帯に黒い字）', dict(style='chi_obi', **{'in': 'cut'}, hold='none', color='k')),
+    'candy': ('キャンディの丸ゴシック（白・要の語は paint でピンク）', dict(style='candy', **{'in': 'pop'}, hold='none', color='w', big=True)),
+    'candy_glitch': ('キャンディの丸ゴシック＋グリッチの線（チャンネルのバナー風）', dict(style='candy_g', **{'in': 'pop'}, hold='none', color='w', big=True)),
     # 討論番組風（2026-11-09）：どれも cut
     'touron_katagaki': ('冒頭の肩書きの札（赤＝前の肩書き・白＝赤い板・黄＝名前・右寄せ）',
                         dict(style='touron_kata', **{'in': 'cut'}, hold='none', color='w', align='r')),
@@ -1968,7 +1991,7 @@ def catalog_kaisan(out):
 
 
 SOZAI_MOODS = ('rittai_aka', 'rittai_metal', 'pop_camp', 'kansha', 'natsu', 'retro_pop', 'aka_gin', 'box_rittai', 'hako_moji', 'amecomi',
-               'furue', 'kyoufu', 'togetoge', 'chi_obi')
+               'furue', 'kyoufu', 'togetoge', 'chi_obi', 'candy', 'candy_glitch')
 SOZAI_SAMPLES = {
     'rittai_aka': ([('受信料', 'r'), ('値下げ!', 'r')], {}),
     'rittai_metal': ([('受信料', 'y'), ('値下げ!?', 'w')], {}),
@@ -1984,6 +2007,8 @@ SOZAI_SAMPLES = {
     'kyoufu': ([('受信料の', 'r'), ('督促状', 'r')], {}),
     'togetoge': ([('割増金を', 'r'), ('請求', 'r')], {}),
     'chi_obi': ([('受信料の取り立てが', 'k'), ('始まった', 'k')], {}),
+    'candy': ([('NHKのひみつ', 'w')], {'paint': {'ひみつ': 'p'}}),
+    'candy_glitch': ([('受信料のなぞ', 'w')], {'paint': {'受信料': 'p'}}),
 }
 TOURON_MOODS = ('touron_katagaki', 'touron_jimaku', 'touron_midashi', 'touron_jinbutsu')
 TOURON_SAMPLES = {
@@ -2565,6 +2590,22 @@ class FxTelop:
                     c_ = mix(st['hgrad'][0], st['hgrad'][1], clamp((u.x + u.adv / 2 - r_['x0']) / max(1.0, r_['x1'] - r_['x0'])))
                     fill = [(0, c_), (1, c_)]
                 img = paint(fm, fill, y0, y1)
+                gd_ = st.get('gloss_dots')
+                if gd_:                                          # つやの点：画の左上の角に小さな丸（キャンディの丸ゴシック・2026-11-09）
+                    L_ = fm.load()
+                    dd = max(2, int(.07 * u.lpx))
+                    pts_, gap_ = [], .32 * u.lpx
+                    for yy in range(dd, h - 1, 2):
+                        for xx in range(dd, w - 1, 2):
+                            if yy < oy - .45 * u.lpx and L_[xx, yy] > 200 and L_[xx - dd, yy] < 60 and L_[xx, yy - dd] < 60:
+                                if all((xx - a_) ** 2 + (yy - b_) ** 2 > gap_ * gap_ for a_, b_ in pts_):
+                                    pts_.append((xx, yy))
+                    dr_ = ImageDraw.Draw(img)
+                    for k_, (xx, yy) in enumerate(pts_[:2]):
+                        r1 = u.lpx * (.07 if k_ == 0 else .05)
+                        cx_, cy_ = xx + dd * 1.5, yy + dd * 1.5
+                        dr_.ellipse([cx_ - r1, cy_ - r1 * .8, cx_ + r1, cy_ + r1 * .8], fill=tuple(gd_) + (235,))
+                    img.putalpha(ImageChops.multiply(img.getchannel('A'), fm))
                 tx_ = st.get('tex')
                 if tx_:                                          # 模様：stripe＝斜めのしま・dots＝水玉（字の大きさに対する割合 size）
                     tz = max(3, int(tx_.get('size', .18) * u.lpx))
@@ -2723,6 +2764,18 @@ class FxTelop:
                     d.ellipse([(cx_ - .85 * u) * S, (cy_ - .6 * u) * S, (cx_ + .85 * u) * S, (cy_ + 1.1 * u) * S], outline=WHITE + (255,), width=lw_)
             elif pl['kind'] == 'none':                          # none：台座なし（札 tag だけを出すため。スタッフの問い）
                 pass
+            elif pl['kind'] == 'glitch':                        # glitch：まわりに横の細い線（ピンク・水色・白・紫）を散らす（2026-11-09）
+                rnd = random.Random(self.seed + 7)
+                cols = [(255, 40, 140), (40, 230, 226), (255, 255, 255), (170, 70, 255), (255, 90, 170)]
+                for _ in range(int((x1 - x0) / em * 3.2)):
+                    yy = rnd.uniform(y0, y1)
+                    if self.by0 - self.ry0 < yy < self.by1 - self.ry0 and rnd.random() < .7:
+                        continue                                  # 字の高さには少なめに（字を邪魔しない）
+                    ln = em * rnd.uniform(.3, 2.4)
+                    xx = rnd.uniform(x0 - em * .3, x1 - ln)
+                    hh = em * rnd.uniform(.03, .08)
+                    c_ = rnd.choice(cols)
+                    d.rectangle([xx * S, yy * S, (xx + ln) * S, (yy + hh) * S], fill=c_ + (int(255 * rnd.uniform(.55, .95)),))
             elif pl['kind'] == 'drip':                          # drip：したたる帯（でこぼこのふち＋下に垂れるしずく・2026-11-09）
                 col = tuple(pl.get('fill', (214, 0, 8))) + (255,)
                 rnd = random.Random(self.seed)
@@ -3010,7 +3063,8 @@ class FxTelop:
                 pl.putalpha(pl.getchannel('A').point(lambda v: int(v * S.plate_a)))
             body = pl.copy()
             body.alpha_composite(R)
-            A = ImageChops.lighter(A, pl.getchannel('A'))
+            if not (self.under_st.get('plate') or {}).get('no_sil'):   # no_sil：台座に影・厚みを付けない（グリッチの線）
+                A = ImageChops.lighter(A, pl.getchannel('A'))
         out = Image.new('RGBA', self.rsize, (0, 0, 0, 0))
         ex = st.get('extrude')
         E = None
