@@ -726,6 +726,43 @@ def st_taidan_shashin(C, key):
     return dict(font='W7', fill=[(0, INK), (1, INK)], plate=dict(kind='bar', fill=[(0, WHITE), (1, WHITE)], pad=(.4, .2), fit_pad=True))
 
 
+# ---- 討論番組風（2026-11-09。ネットの討論番組の字幕から、作りの族だけを写した。番組名・ロゴ・出演者の名前は描かない）。どれも出方は cut
+_TR_BROWN, _TR_RED = (82, 30, 6), (232, 16, 22)
+
+
+def st_touron_kata(C, key):
+    """冒頭の肩書きの札：赤＝赤い明朝＋白い縁（前の肩書き）／白＝赤い板に白い太字（今の肩書き・板は行をまたいで 1 枚）／
+    黄＝黄色い太字＋黒い縁（名前・sizes で大きく）。まとまりは右寄せ・行は左揃え"""
+    if key == 'r':
+        return dict(font='mincho', bold=.02, row_gap=.14, fill=[(0, _TR_RED), (1, (200, 0, 10))], layers=[dict(w=.1, color=WHITE)],
+                    shadow=dict(dx=.02, dy=.03, blur=.03, a=.4), plate=dict(kind='none', per_line=True, pad=(0, 0)))
+    if key in ('y', 'o'):
+        return dict(font='W9', row_gap=.14, fill=[(0, (255, 244, 0)), (1, (255, 226, 0))], layers=[dict(w=.07, color=(10, 10, 10))],
+                    shadow=dict(dx=.02, dy=.03, blur=.03, a=.4), plate=dict(kind='none', per_line=True, pad=(0, 0)))
+    return dict(font='W8', row_gap=.14, fill=[(0, WHITE), (1, WHITE)], plate=dict(kind='bar', per_line=True, block_w=True, fill=[(0, _TR_RED), (1, _TR_RED)],
+                                                                      pad=(.18, .12), fit_pad=True))
+
+
+def st_touron_jimaku(C, key):
+    """討論の字幕：半透明の暗い箱（行をまとめて 1 枚）に白い太字・行は左揃え"""
+    T_ = {'y': (255, 230, 40), 'r': (255, 80, 80)}.get(key, WHITE)
+    return dict(font='W8', row_l=True, fill=[(0, T_), (1, T_)],
+                plate=dict(kind='bar', fill=[(0, (14, 14, 16)), (1, (14, 14, 16))], alpha=.62, pad=(.25, .14), fit_pad=True))
+
+
+def st_touron_midashi(C, key):
+    """右上の話題の見出し：白い帯に黒い太い明朝・下に茶色の線"""
+    return dict(font='mincho', bold=.012, fill=[(0, INK), (1, INK)],
+                plate=dict(kind='bar', fill=[(0, WHITE), (1, (244, 242, 238))], alpha=.95, pad=(.3, .14), bot=_TR_BROWN, fit_pad=True))
+
+
+def st_touron_jinbutsu(C, key):
+    """人物紹介の札：茶色の板＋内側の細い明るい線に白い字（字の間を広く）・左上に名前のタブ（tag）"""
+    return dict(font='W6', track=.06, row_l=True, fill=[(0, WHITE), (1, WHITE)],
+                plate=dict(kind='bar', fill=[(0, _TR_BROWN), (1, _TR_BROWN)], alpha=.96, pad=(.9, .6), inner=(236, 214, 190), fit_pad=True,
+                           tag_kind='tab_over', tag_fill=_TR_BROWN, tag_ink=WHITE, tag_edge=(236, 214, 190), tag_size=.82, tag_r=0))
+
+
 def st_doc(C, key):
     """ドキュメンタリー番組の題字（2026-11-08。大型ドキュメンタリーのタイトルの作りの族）：白い明朝＋暗いにじみ（光らせない＝白い光は読めない 11-07）。
     肩書き（上の小さい行）・副題（下の「〜…〜」）は fx の sizes（行ごとの大きさ）と fonts（行ごとの書体）で"""
@@ -889,6 +926,10 @@ STYLES = {
     'taidan_namae': ('名前（白い太字＋やわらかい影）', st_taidan_namae),
     'taidan_shashin': ('写真の見出し（白い板に黒い字）', st_taidan_shashin),
     'taidan_profile': ('ゲストプロフィールの板（紫→青の板・肩書き・名前・白い板の紹介文）', lambda C, key: st_taidan_namae(C, key)),
+    'touron_kata': ('冒頭の肩書きの札（赤い明朝・赤い板・黄色い名前）', st_touron_kata),
+    'touron_jimaku': ('討論の字幕（半透明の暗い箱に白い太字）', st_touron_jimaku),
+    'touron_midashi': ('右上の話題の見出し（白い帯に黒い明朝・茶色の線）', st_touron_midashi),
+    'touron_jinbutsu': ('人物紹介の札（茶色の板・名前のタブ）', st_touron_jinbutsu),
     'kouhou': ('広報の告知の字（黒い中太・白＝灰色の肩書き・黄＝下に黄色い線）', st_kouhou),
     'kouhou_fuki': ('広報の吹き出し（赤い板に白い字・下にしっぽ）', st_kouhou_fuki),
     'kouhou_arc': ('弧に並ぶ字（広報の「よろしくお願いします」）', st_kouhou_arc),
@@ -919,7 +960,7 @@ STYLES = {
     'tokuban_2024': ('選挙特番の題字 2024（白から金の細めの明朝＋金の厚み）', st_tokuban_2024),
     'tokuban_2026': ('選挙特番の題字 2026（金の明朝＋赤い縁＋赤い光）', st_tokuban_2026),
 }
-MULTI_LINE_FX = ('yontaku', 'jikanwari', 'taidan_profile')       # 3 行を超えてよい決めテロップ（build_premiere が控えの文字クリップを 3 行までにする）
+MULTI_LINE_FX = ('yontaku', 'jikanwari', 'taidan_profile', 'touron_kata')       # 3 行を超えてよい決めテロップ（build_premiere が控えの文字クリップを 3 行までにする）
 
 
 def style_of(name, key, over=None):
@@ -1561,6 +1602,12 @@ MOODS = {
     'taidan_shashin': ('写真の見出し（白い板に黒い字・左上）', dict(style='taidan_shashin', **{'in': 'cut'}, hold='none', color='k', align='l')),
     'taidan_profile': ('ゲストプロフィールの板（1行目＝肩書き・2行目＝名前・3行目から紹介文）',
                        dict(style='taidan_profile', **{'in': 'cut'}, hold='none', color='w')),
+    # 討論番組風（2026-11-09）：どれも cut
+    'touron_katagaki': ('冒頭の肩書きの札（赤＝前の肩書き・白＝赤い板・黄＝名前・右寄せ）',
+                        dict(style='touron_kata', **{'in': 'cut'}, hold='none', color='w', align='r')),
+    'touron_jimaku': ('討論の字幕（半透明の暗い箱・行は左揃え）', dict(style='touron_jimaku', **{'in': 'cut'}, hold='none', color='w')),
+    'touron_midashi': ('右上の話題の見出し（白い帯＋茶色の線・右寄せ）', dict(style='touron_midashi', **{'in': 'cut'}, hold='none', color='k', align='r')),
+    'touron_jinbutsu': ('人物紹介の札（茶色の板・名前のタブは tag・左寄せ）', dict(style='touron_jinbutsu', **{'in': 'cut'}, hold='none', color='w', align='l')),
     'doc_title': ('ドキュメンタリー番組の題字（白い明朝・肩書きと副題は sizes と fonts）', dict(style='doc', **{'in': 'doc_in'}, hold='grow', out='fade', color='w')),
     # 選挙特番の題字（2026-11-07）：年ごとの「衆議院解散」の題字の作り。行の色＝黄で元のまま・白で銀・ほかの色でその色の光と縁
     **{f'kaisan_{y}': (f'選挙特番の題字 {y} 年の作り（NHK の衆議院解散の題字）', dict(style=f'tokuban_{y}', **{'in': 'pop'}, hold='none', color='y'))
@@ -1734,6 +1781,14 @@ def catalog_kaisan(out):
     return _grid_video(cells, Path(out) / '見本_11_選挙特番の題字.mp4', '選挙特番の題字（年ごと・2026-11-07）', sec=2.6)
 
 
+TOURON_MOODS = ('touron_katagaki', 'touron_jimaku', 'touron_midashi', 'touron_jinbutsu')
+TOURON_SAMPLES = {
+    'touron_katagaki': ([('元NHK営業局', 'r'), ('受信料担当', 'r'), ('受信料と', 'w'), ('番組の裏側を', 'w'), ('語る元職員', 'w'), ('ある元職員', 'y')],
+                        {'sizes': [.82, .82, 1, 1, 1, 1.45]}),
+    'touron_jimaku': ([('受信料は一時期', 'w'), ('値下げの話もあったんですよ', 'w')], {}),
+    'touron_midashi': ([('受信料はなぜ高いのか？', 'k')], {}),
+    'touron_jinbutsu': ([('NHKで営業と番組制作に長く携わる', 'w'), ('受信料のしくみを内側から解説', 'w')], {'tag': 'ある元職員'}),
+}
 TAIDAN_MOODS = ('taidan_obi', 'taidan_2dan', 'taidan_kuro', 'taidan_midashi', 'taidan_namae', 'taidan_shashin', 'taidan_profile')
 TAIDAN_SAMPLES = {
     'taidan_obi': ([('受信料は払うべきなのか', 'w')], {}),
@@ -2417,6 +2472,12 @@ class FxTelop:
                     d.rectangle([x0 * S, y0 * S, x1 * S, y0 * S + tw_], fill=tuple(pl['top']) + (255,))
                 if pl.get('edge'):
                     d.rectangle([x0 * S, y0 * S, x1 * S, y1 * S], outline=tuple(pl['edge']) + (255,), width=max(1, int(em * .025 * S)))
+                if pl.get('bot'):                               # 下の色の線（討論の見出しの茶色の線）
+                    d.rectangle([x0 * S, (y1 - em * .07) * S, x1 * S, y1 * S], fill=tuple(pl['bot']) + (255,))
+                if pl.get('inner'):                             # 内側の細い線（人物紹介の札）
+                    g_ = em * .12
+                    d.rectangle([(x0 + g_) * S, (y0 + g_) * S, (x1 - g_) * S, (y1 - g_) * S], outline=tuple(pl['inner']) + (255,),
+                                width=max(2, int(em * .03 * S)))
                 if pl.get('icon'):                              # 左に色の四角の撮影の印（白いカメラ）＝撮影の札
                     sq = y1 - y0
                     d.rectangle([(x0 - sq) * S, y0 * S, x0 * S, y1 * S], fill=tuple(pl['icon']) + (255,))
@@ -2515,6 +2576,10 @@ class FxTelop:
                 qx, qy = rp.get('pad', (.4, .2))
                 a0x, a1x = r['x0'] - o - qx * r['px'] - self.rx0, r['x1'] + o + qx * r['px'] - self.rx0
                 a0y, a1y = r['base'] - .88 * r['px'] - o - qy * r['px'] - self.ry0, r['base'] + .12 * r['px'] + o + qy * r['px'] - self.ry0
+                if rp.get('block_w'):                       # 同じ台座（block_w）の行の左右の端をそろえる＝行をまたいで 1 枚の板に
+                    grp = [r_ for r_ in self.rows if (r_['st'].get('plate') or {}).get('block_w')]
+                    a0x = min(r_['x0'] for r_ in grp) - o - qx * r['px'] - self.rx0
+                    a1x = max(r_['x1'] for r_ in grp) + o + qx * r['px'] - self.rx0
                 if rp.get('full'):
                     a0x, a1x = sx0 - self.rx0, sx1 - self.rx0
                 a0x, a1x = max(a0x, sx0 - self.rx0), min(a1x, sx1 - self.rx0)
@@ -2547,6 +2612,15 @@ class FxTelop:
                 th = em * .9
                 bx0, by1 = x0 + (y1 - y0) * .32 + em * .2, y0 + th * .18      # 上の縁にまたがる（字にはかけない）
                 box = [bx0, by1 - th, bx0 + tw + em * 1.0, by1]
+            elif pl.get('tag_kind') == 'tab_over':            # 板の上の縁にまたがるタブ（人物紹介の名前・内側に細い線）
+                th = em * pl.get('tag_size', .82) * 1.45
+                bx0 = x0 + em * .45
+                box = [bx0, y0 - th * .72, bx0 + tw + em * .9, y0 + th * .28]
+                d.rectangle([v * S for v in box], fill=tuple(pl['tag_fill']) + (255,), outline=tuple(pl['tag_edge']) + (255,),
+                            width=max(2, int(em * .03 * S)))
+                d.text(((box[0] + box[2]) / 2 * S, (box[1] + box[3]) / 2 * S), tag, font=fx_font('W9', f.size * S),
+                       fill=tuple(pl['tag_ink']) + (255,), anchor='mm', **FEAT)
+                tag = None
             elif pl.get('tag_kind') == 'under':               # 下の暗い帯：板の下にくっつけて、字は右寄せ（映像の右上の字幕の場所）
                 uh = em * .62
                 d.rectangle([x0 * S, y1 * S, x1 * S, (y1 + uh) * S], fill=tuple(pl['tag_fill']) + (int(255 * .82),))
@@ -4036,7 +4110,7 @@ def catalog_xml_looks(out):
 CATALOG_DIR = Path(__import__('os').environ.get('TELOP_CATALOG_DIR') or Path(__file__).resolve().parent.parent / 'catalog')
 CATALOG_GROUPS = (('kihon', '基本'), ('glow', 'グロー系'), ('variety', 'バラエティの字幕型'), ('news', 'ニュース風'), ('kaiten', '3D 回転'),
                   ('quiz', 'クイズ'), ('parody', 'ニュース・情報番組（パロディ用）'), ('tokuban', '選挙特番の題字（年ごと）'),
-                  ('gaitou', '街頭インタビュー風'), ('taidan', 'ビジネス対談風'))
+                  ('gaitou', '街頭インタビュー風'), ('taidan', 'ビジネス対談風'), ('touron', '討論番組風'))
 
 
 # 題字の色違い（2026-11-07 ユーザー「これも登録しておいて」）：カード 1 枚で色まで決まる（tint・metal）
@@ -4058,12 +4132,13 @@ def _catalog_entries():
     for name, (desc, m) in MOODS.items():
         group = ('glow' if name in GLOW_MOODS else 'variety' if name in VARIETY_MOODS else 'news' if name in NEWS_MOODS
                  else 'kaiten' if name in KAITEN_MOODS else 'quiz' if name in QUIZ_MOODS else 'parody' if name in PARODY_MOODS
-                 else 'tokuban' if name in KAISAN_MOODS else 'gaitou' if name in GAITOU_MOODS else 'taidan' if name in TAIDAN_MOODS else 'kihon')
+                 else 'tokuban' if name in KAISAN_MOODS else 'gaitou' if name in GAITOU_MOODS else 'taidan' if name in TAIDAN_MOODS
+                 else 'touron' if name in TOURON_MOODS else 'kihon')
         lines, paint = _card_sample(name, m)
         fx = dict(mood=name, **({'paint': paint} if paint else {}), **(NEWS_SAMPLES[name][1] if name in NEWS_MOODS else {}),
                   **(QUIZ_SAMPLES[name][1] if name in QUIZ_MOODS else {}), **VARIETY_EXTRA.get(name, {}),
                   **(PARODY_SAMPLES[name][1] if name in PARODY_MOODS else {}), **(GAITOU_SAMPLES[name][1] if name in GAITOU_MOODS else {}),
-                  **(TAIDAN_SAMPLES[name][1] if name in TAIDAN_MOODS else {}))
+                  **(TAIDAN_SAMPLES[name][1] if name in TAIDAN_MOODS else {}), **(TOURON_SAMPLES[name][1] if name in TOURON_MOODS else {}))
         out.append((name, desc, m, group, lines, fx))
     for base, tint, metal, label in KAISAN_VARIANTS:
         vid = f'{base}_{tint}' + ('_metal' if metal else '')
@@ -4085,7 +4160,7 @@ def _nhk_status(name, m):
     if (name == 'ikari' or name in KAITEN_MOODS or name in PARODY_MOODS or name in KAISAN_MOODS
             or name in ('yontaku_nhk', 'mondai_nhk')):      # 3D 回転・4択の NHK 版・パロディ用は 11-07 に候補へ（ユーザー）
         return 'use'
-    if name in VARIETY_MOODS or name in NEWS_MOODS or name in QUIZ_MOODS or name in GAITOU_MOODS or name in TAIDAN_MOODS:
+    if name in VARIETY_MOODS or name in NEWS_MOODS or name in QUIZ_MOODS or name in GAITOU_MOODS or name in TAIDAN_MOODS or name in TOURON_MOODS:
         return 'tbd'
     return 'ok'
 
@@ -4119,6 +4194,8 @@ def _card_sample(name, m):
         return GAITOU_SAMPLES[name][0], None
     if name in TAIDAN_SAMPLES:
         return TAIDAN_SAMPLES[name][0], None
+    if name in TOURON_SAMPLES:
+        return TOURON_SAMPLES[name][0], None
     return BASIC_SAMPLES.get(name, [('受信料の', 'w'), ('使い道', m.get('color', 'y'))]), None
 
 
