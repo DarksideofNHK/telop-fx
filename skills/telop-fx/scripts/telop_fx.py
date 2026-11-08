@@ -763,6 +763,91 @@ def st_touron_jinbutsu(C, key):
                            tag_kind='tab_over', tag_fill=_TR_BROWN, tag_ink=WHITE, tag_edge=(236, 214, 190), tag_size=.82, tag_r=0))
 
 
+# ---- ポップ・立体の題字（2026-11-09。市販のテロップ素材集の見本画像から、縁の重ね方・厚み・色の族だけを写した。素材そのものは使わない）
+#      出方は pop。模様（しま・水玉）は型の tex
+def st_rittai_aka(C, key):
+    """赤い立体：赤のグラデの字＋金の縁＋濃い赤の外縁＋深い厚み（「OPEN!」）"""
+    F = ([(0, (255, 130, 100)), (.45, (240, 30, 20)), (1, (168, 0, 0))] if key in ('r', 'w')
+         else [(0, lighten(C, .45)), (.45, C), (1, darken(C, .35))])
+    return dict(font='W9', layers=[dict(w=.21, color=(70, 8, 0)), dict(w=.14, grad=[(0, (255, 250, 180)), (.5, (255, 204, 0)), (1, (226, 140, 0))]),
+                                   dict(w=.045, color=(120, 10, 0))],
+                fill=F, bevel=.3, extrude=dict(dx=.02, dy=.1, color=(116, 8, 0)), shadow=dict(dx=.03, dy=.13, blur=.04, a=.5))
+
+
+def st_rittai_metal(C, key):
+    """金・銀の立体：照りの折り返しのある金（黄）か銀（白）の字＋黒い太縁＋灰の縁＋深い黒い厚み（「緊急値下げ」）"""
+    F = ([(0, WHITE), (.42, (206, 210, 218)), (.5, (118, 122, 132)), (.56, (236, 238, 242)), (1, (150, 154, 166))] if key in ('w', 'k')
+         else [(0, (255, 250, 196)), (.42, (255, 214, 0)), (.5, (214, 150, 0)), (.56, (255, 232, 70)), (1, (200, 128, 0))] if key in ('y', 'o')
+         else [(0, lighten(C, .7)), (.42, C), (.5, darken(C, .35)), (.56, lighten(C, .4)), (1, darken(C, .2))])
+    return dict(font='W9', layers=[dict(w=.21, color=(12, 12, 14)), dict(w=.11, color=(84, 84, 90)), dict(w=.04, color=(20, 20, 22))],
+                fill=F, bevel=.35, extrude=dict(dx=.02, dy=.09, color=(30, 30, 34)), shadow=dict(dx=.03, dy=.12, blur=.04, a=.5))
+
+
+def st_pop_camp(C, key):
+    """ポップなキャンペーン：ピンク・青ほかの斜めの太字＋白い太縁＋紺の外縁＋淡い厚み（「応援キャンペーン」「配信テロップ」）"""
+    F = {'p': [(0, (255, 132, 170)), (1, (232, 48, 112))], 'b': [(0, (80, 156, 255)), (1, (24, 92, 212))]}.get(key) or soft_fill(C)
+    return dict(font='W9', skew=.1, layers=[dict(w=.21, color=(52, 80, 140)), dict(w=.14, color=WHITE)], fill=F,
+                extrude=dict(dx=.02, dy=.07, color=(150, 170, 204)), shadow=dict(dx=.03, dy=.09, blur=.04, a=.35))
+
+
+def st_kansha(C, key):
+    """秋の感謝祭：橙→黄の字に水玉＋茶色の太縁＋クリームの外縁＋茶色の厚み"""
+    C2 = (250, 140, 0) if key in ('o', 'y', 'w') else C
+    return dict(font='W9', layers=[dict(w=.24, color=(255, 246, 222)), dict(w=.15, color=(104, 48, 10))],
+                fill=[(0, (255, 226, 70)), (1, C2)], tex=dict(kind='dots', color=(255, 246, 190), size=.17, a=.4),
+                extrude=dict(dx=.02, dy=.07, color=(104, 48, 10)), shadow=dict(dx=.02, dy=.09, blur=.04, a=.35))
+
+
+def st_natsu(C, key):
+    """夏のしま模様：色の斜めのしまの字＋紺の縁＋白い太縁＋水色の外縁（「夏得キャンペーン」）"""
+    A, B = {'b': ((34, 104, 226), (110, 196, 255)), 'y': ((255, 200, 0), (255, 238, 120)), 'g': ((20, 170, 140), (120, 230, 200)),
+            'p': ((236, 70, 140), (255, 160, 200))}.get(key, (darken(C, .1), lighten(C, .45)))
+    return dict(font='W9', layers=[dict(w=.26, color=(120, 200, 255)), dict(w=.19, color=WHITE), dict(w=.07, color=(12, 40, 120))],
+                fill=[(0, A), (1, A)], tex=dict(kind='stripe', color=B, size=.2, a=1.0),
+                shadow=dict(dx=.03, dy=.06, blur=.04, a=.35))
+
+
+def st_retro_pop(C, key):
+    """パステルのレトロポップ：丸ゴシックを太らせた字にピンク→黄→緑→水色のグラデ＋紫の縁＋白い太縁＋ピンクの外縁"""
+    return dict(font='maru', bold=.07, layers=[dict(w=.3, color=(255, 172, 222)), dict(w=.22, color=WHITE), dict(w=.1, color=(152, 92, 224))],
+                fill=[(0, (255, 150, 212)), (.38, (255, 238, 150)), (.66, (150, 238, 170)), (1, (140, 200, 255))],
+                shadow=dict(dx=.02, dy=.05, blur=.04, a=.3))
+
+
+def st_aka_gin(C, key):
+    """赤と銀の斜めの立体：銀の字＋濃い赤の縁＋赤い太縁＋金の外縁＋赤い深い厚み（「リフレッシュオープン」）"""
+    E = {'b': (20, 70, 200), 'g': (20, 130, 60)}.get(key, (204, 12, 22))
+    return dict(font='W9', skew=.18, layers=[dict(w=.24, color=(242, 192, 44)), dict(w=.18, color=E), dict(w=.05, color=darken(E, .55))],
+                fill=[(0, WHITE), (.5, (222, 224, 230)), (1, (158, 162, 176))], bevel=.3,
+                extrude=dict(dx=.03, dy=.1, color=darken(E, .3)), shadow=dict(dx=.04, dy=.13, blur=.04, a=.5))
+
+
+SOZAI_BOX = {'g': (36, 168, 60), 'p': (236, 96, 196), 'b': (28, 70, 200), 'v': (130, 60, 206), 'r': (214, 30, 30), 'o': (236, 120, 0),
+             'y': (230, 180, 0), 'c': (0, 150, 210), 'k': (24, 24, 28), 'w': (36, 168, 60)}
+
+
+def st_box_rittai(C, key):
+    """色の板の立体：色の板（行の色）に白い太字、右下に黒い厚み（「ボックスが文字に追従」）"""
+    P_ = SOZAI_BOX.get(key, SOZAI_BOX['g'])
+    return dict(font='W8', fill=[(0, WHITE), (1, WHITE)], layers=[dict(w=.05, color=darken(P_, .55))],
+                plate=dict(kind='rect', grad=[(0, lighten(P_, .15)), (1, darken(P_, .1))], edge=(14, 14, 16), depth=.11, pad=(.3, .14)))
+
+
+def st_hako_moji(C, key):
+    """1字ずつの色の箱：1字ごとに色の箱（行の色・paint で替わる）に白い字、右下に黒い厚み（「立体テロップボックス」）"""
+    B = WHITE if key == 'w' else SOZAI_BOX.get(key, SOZAI_BOX['k'])
+    T_ = INK if key == 'w' else WHITE
+    return dict(font='W8', track=.18, fill=[(0, T_), (1, T_)], char_box=B, box_depth=.09)
+
+
+def st_amecomi(C, key):
+    """アメコミ風：黄→橙→ピンクの斜めの字＋黒い縁＋白い太縁＋黒い外縁＋黒い厚み"""
+    F = ([(0, (255, 244, 0)), (.5, (255, 150, 0)), (1, (255, 60, 160))] if key in ('y', 'o', 'w')
+         else [(0, lighten(C, .55)), (.5, C), (1, darken(C, .3))])
+    return dict(font='W9', skew=.2, layers=[dict(w=.27, color=(10, 10, 12)), dict(w=.2, color=WHITE), dict(w=.065, color=(10, 10, 12))], fill=F,
+                extrude=dict(dx=.05, dy=.06, color=(10, 10, 12)), shadow=dict(dx=.06, dy=.08, blur=.02, a=.4))
+
+
 def st_doc(C, key):
     """ドキュメンタリー番組の題字（2026-11-08。大型ドキュメンタリーのタイトルの作りの族）：白い明朝＋暗いにじみ（光らせない＝白い光は読めない 11-07）。
     肩書き（上の小さい行）・副題（下の「〜…〜」）は fx の sizes（行ごとの大きさ）と fonts（行ごとの書体）で"""
@@ -927,6 +1012,16 @@ STYLES = {
     'taidan_shashin': ('写真の見出し（白い板に黒い字）', st_taidan_shashin),
     'taidan_profile': ('ゲストプロフィールの板（紫→青の板・肩書き・名前・白い板の紹介文）', lambda C, key: st_taidan_namae(C, key)),
     'touron_kata': ('冒頭の肩書きの札（赤い明朝・赤い板・黄色い名前）', st_touron_kata),
+    'rittai_aka': ('赤い立体（金の縁＋深い厚み）', st_rittai_aka),
+    'rittai_metal': ('金・銀の立体（黄＝金・白＝銀・黒い太縁＋深い厚み）', st_rittai_metal),
+    'pop_camp': ('ポップなキャンペーン（斜めの太字＋白い太縁＋紺の外縁）', st_pop_camp),
+    'kansha': ('秋の感謝祭（橙の字に水玉＋茶色とクリームの縁）', st_kansha),
+    'natsu': ('夏のしま模様（しまの字＋紺・白・水色の縁）', st_natsu),
+    'retro_pop': ('パステルのレトロポップ（丸ゴシック・紫・白・ピンクの縁）', st_retro_pop),
+    'aka_gin': ('赤と銀の斜めの立体（銀の字＋赤と金の縁＋赤い厚み）', st_aka_gin),
+    'box_rittai': ('色の板の立体（色の板に白い字＋黒い厚み）', st_box_rittai),
+    'hako_moji': ('1字ずつの色の箱（白い字・黒い厚み）', st_hako_moji),
+    'amecomi': ('アメコミ風（黄→橙→ピンクの斜めの字＋黒白黒の縁）', st_amecomi),
     'touron_jimaku': ('討論の字幕（半透明の暗い箱に白い太字）', st_touron_jimaku),
     'touron_midashi': ('右上の話題の見出し（白い帯に黒い明朝・茶色の線）', st_touron_midashi),
     'touron_jinbutsu': ('人物紹介の札（茶色の板・名前のタブ）', st_touron_jinbutsu),
@@ -1602,6 +1697,17 @@ MOODS = {
     'taidan_shashin': ('写真の見出し（白い板に黒い字・左上）', dict(style='taidan_shashin', **{'in': 'cut'}, hold='none', color='k', align='l')),
     'taidan_profile': ('ゲストプロフィールの板（1行目＝肩書き・2行目＝名前・3行目から紹介文）',
                        dict(style='taidan_profile', **{'in': 'cut'}, hold='none', color='w')),
+    # ポップ・立体の題字（2026-11-09・素材集風）：出方は pop（板と箱は cut）
+    'rittai_aka': ('赤い立体の題字（金の縁＋深い厚み）', dict(style='rittai_aka', **{'in': 'pop'}, hold='none', color='r', big=True)),
+    'rittai_metal': ('金・銀の立体の題字（行の色 y＝金・w＝銀）', dict(style='rittai_metal', **{'in': 'pop'}, hold='none', color='y', big=True)),
+    'pop_camp': ('ポップなキャンペーンの題字（行の色 p・b ほか・斜め）', dict(style='pop_camp', **{'in': 'pop'}, hold='none', color='p', big=True)),
+    'kansha': ('秋の感謝祭風の題字（水玉の字・茶色の縁）', dict(style='kansha', **{'in': 'pop'}, hold='none', color='o', big=True)),
+    'natsu': ('夏のしま模様の題字（行の色 b・y・g・p でしまの色）', dict(style='natsu', **{'in': 'pop'}, hold='none', color='b', big=True)),
+    'retro_pop': ('パステルのレトロポップの題字（丸ゴシック）', dict(style='retro_pop', **{'in': 'pop'}, hold='none', color='p', big=True)),
+    'aka_gin': ('赤と銀の斜めの立体の題字（行の色 r・b・g で縁の色）', dict(style='aka_gin', **{'in': 'pop'}, hold='none', color='r', big=True)),
+    'box_rittai': ('色の板の立体（行の色で板の色・白い字）', dict(style='box_rittai', **{'in': 'cut'}, hold='none', color='g')),
+    'hako_moji': ('1字ずつの色の箱（行の色・paint で箱の色）', dict(style='hako_moji', **{'in': 'cut'}, hold='none', color='k')),
+    'amecomi': ('アメコミ風の題字（黄→橙→ピンク・斜め）', dict(style='amecomi', **{'in': 'pop'}, hold='none', color='y', big=True)),
     # 討論番組風（2026-11-09）：どれも cut
     'touron_katagaki': ('冒頭の肩書きの札（赤＝前の肩書き・白＝赤い板・黄＝名前・右寄せ）',
                         dict(style='touron_kata', **{'in': 'cut'}, hold='none', color='w', align='r')),
@@ -1781,6 +1887,19 @@ def catalog_kaisan(out):
     return _grid_video(cells, Path(out) / '見本_11_選挙特番の題字.mp4', '選挙特番の題字（年ごと・2026-11-07）', sec=2.6)
 
 
+SOZAI_MOODS = ('rittai_aka', 'rittai_metal', 'pop_camp', 'kansha', 'natsu', 'retro_pop', 'aka_gin', 'box_rittai', 'hako_moji', 'amecomi')
+SOZAI_SAMPLES = {
+    'rittai_aka': ([('受信料', 'r'), ('値下げ!', 'r')], {}),
+    'rittai_metal': ([('受信料', 'y'), ('値下げ!?', 'w')], {}),
+    'pop_camp': ([('解約', 'p'), ('キャンペーン', 'b')], {}),
+    'kansha': ([('受信料', 'o'), ('感謝祭!', 'o')], {}),
+    'natsu': ([('夏の', 'b'), ('受信料', 'y')], {}),
+    'retro_pop': ([('NHKの', 'p'), ('ひみつ', 'p')], {}),
+    'aka_gin': ([('NHK', 'r'), ('リニューアル', 'r')], {}),
+    'box_rittai': ([('受信料の使い道', 'g')], {}),
+    'hako_moji': ([('受信料のなぞ', 'k')], {'paint': {'の': 'r'}}),
+    'amecomi': ([('受信料', 'y'), ('ゼロ円!?', 'y')], {}),
+}
 TOURON_MOODS = ('touron_katagaki', 'touron_jimaku', 'touron_midashi', 'touron_jinbutsu')
 TOURON_SAMPLES = {
     'touron_katagaki': ([('元NHK営業局', 'r'), ('受信料担当', 'r'), ('受信料と', 'w'), ('番組の裏側を', 'w'), ('語る元職員', 'w'), ('ある元職員', 'y')],
@@ -2315,7 +2434,7 @@ class FxTelop:
                 ws = deco_widths(st, px, self.own)
             P = max(ws + [bold]) + 4
             if getattr(u, 'box', None):                      # 色の箱の余白の分も絵を広げる
-                P = max(P, int(.13 * u.lpx) + 4)
+                P = max(P, int((.13 + st.get('box_depth', 0)) * u.lpx) + 4)
             sk = st.get('skew', 0)
             skp = int(math.ceil(abs(sk) * (asc + desc + 2 * P)))
             w, h = int(math.ceil(u.adv)) + 2 * P + 2 * skp, asc + desc + 2 * P
@@ -2351,6 +2470,23 @@ class FxTelop:
                     c_ = mix(st['hgrad'][0], st['hgrad'][1], clamp((u.x + u.adv / 2 - r_['x0']) / max(1.0, r_['x1'] - r_['x0'])))
                     fill = [(0, c_), (1, c_)]
                 img = paint(fm, fill, y0, y1)
+                tx_ = st.get('tex')
+                if tx_:                                          # 模様：stripe＝斜めのしま・dots＝水玉（字の大きさに対する割合 size）
+                    tz = max(3, int(tx_.get('size', .18) * u.lpx))
+                    pat = Image.new('L', (w, h), 0)
+                    pd = ImageDraw.Draw(pat)
+                    if tx_.get('kind') == 'stripe':
+                        for k_ in range(-h, w + h, tz * 2):
+                            pd.polygon([(k_, h), (k_ + tz, h), (k_ + tz + h, 0), (k_ + h, 0)], fill=int(255 * tx_.get('a', 1.0)))
+                    else:
+                        r_ = tz * .32
+                        for jy, yy in enumerate(range(0, h + tz, tz)):
+                            for xx in range(0, w + tz, tz):
+                                cx_ = xx + (tz / 2 if jy % 2 else 0)
+                                pd.ellipse([cx_ - r_, yy - r_, cx_ + r_, yy + r_], fill=int(255 * tx_.get('a', 1.0)))
+                    lay = Image.new('RGBA', (w, h), tuple(tx_['color']) + (0,))
+                    lay.putalpha(ImageChops.multiply(pat, fm))
+                    img.alpha_composite(lay)
                 bv = st.get('bevel', 0)
                 if bv:
                     d = max(1, int(round(.022 * px)))
@@ -2371,6 +2507,9 @@ class FxTelop:
                     if len(u.box) > 3:                           # 1字ずつの箱：字の幅より少し広い正方形に近い箱＋黒い枠
                         o2 = .05 * lp
                         xa, xb = ox - o2, ox + u.adv + o2
+                        dp = st.get('box_depth', 0) * lp           # 右下の黒い厚み（1字ずつの色の箱・2026-11-09）
+                        if dp:
+                            bd.rectangle([xa + dp, ya + dp, xb + dp, yb + dp], fill=(14, 14, 16, 255))
                         bd.rectangle([xa, ya, xb, yb], fill=C + (255,), outline=INK + (255,), width=max(2, int(.055 * lp)))
                     else:
                         bd.rectangle([xa, ya, xb, yb], fill=C + (255,))
@@ -2426,7 +2565,7 @@ class FxTelop:
                 d.line([(poly[0][0] * S, poly[0][1] * S + ew / 2), (poly[1][0] * S, poly[1][1] * S + ew / 2)], fill=e, width=ew)
                 d.line([(poly[3][0] * S, poly[3][1] * S - ew / 2), (poly[2][0] * S, poly[2][1] * S - ew / 2)], fill=e, width=ew)
             elif pl['kind'] == 'rect':                          # rect：四角い板（縦のグラデーション＋右と下に濃い厚み）
-                th = max(2, int(.045 * em))
+                th = max(2, int(pl.get('depth', .045) * em))
                 e = tuple(pl.get('edge', (120, 70, 0))) + (255,)
                 d.rectangle([(x0 + th) * S, (y0 + th) * S, (x1 + th) * S, (y1 + th) * S], fill=e)
                 m = Image.new('L', img.size, 0)
@@ -4110,7 +4249,7 @@ def catalog_xml_looks(out):
 CATALOG_DIR = Path(__import__('os').environ.get('TELOP_CATALOG_DIR') or Path(__file__).resolve().parent.parent / 'catalog')
 CATALOG_GROUPS = (('kihon', '基本'), ('glow', 'グロー系'), ('variety', 'バラエティの字幕型'), ('news', 'ニュース風'), ('kaiten', '3D 回転'),
                   ('quiz', 'クイズ'), ('parody', 'ニュース・情報番組（パロディ用）'), ('tokuban', '選挙特番の題字（年ごと）'),
-                  ('gaitou', '街頭インタビュー風'), ('taidan', 'ビジネス対談風'), ('touron', '討論番組風'))
+                  ('gaitou', '街頭インタビュー風'), ('taidan', 'ビジネス対談風'), ('touron', '討論番組風'), ('sozai', 'ポップ・立体の題字（素材集風）'))
 
 
 # 題字の色違い（2026-11-07 ユーザー「これも登録しておいて」）：カード 1 枚で色まで決まる（tint・metal）
@@ -4133,12 +4272,13 @@ def _catalog_entries():
         group = ('glow' if name in GLOW_MOODS else 'variety' if name in VARIETY_MOODS else 'news' if name in NEWS_MOODS
                  else 'kaiten' if name in KAITEN_MOODS else 'quiz' if name in QUIZ_MOODS else 'parody' if name in PARODY_MOODS
                  else 'tokuban' if name in KAISAN_MOODS else 'gaitou' if name in GAITOU_MOODS else 'taidan' if name in TAIDAN_MOODS
-                 else 'touron' if name in TOURON_MOODS else 'kihon')
+                 else 'touron' if name in TOURON_MOODS else 'sozai' if name in SOZAI_MOODS else 'kihon')
         lines, paint = _card_sample(name, m)
         fx = dict(mood=name, **({'paint': paint} if paint else {}), **(NEWS_SAMPLES[name][1] if name in NEWS_MOODS else {}),
                   **(QUIZ_SAMPLES[name][1] if name in QUIZ_MOODS else {}), **VARIETY_EXTRA.get(name, {}),
                   **(PARODY_SAMPLES[name][1] if name in PARODY_MOODS else {}), **(GAITOU_SAMPLES[name][1] if name in GAITOU_MOODS else {}),
-                  **(TAIDAN_SAMPLES[name][1] if name in TAIDAN_MOODS else {}), **(TOURON_SAMPLES[name][1] if name in TOURON_MOODS else {}))
+                  **(TAIDAN_SAMPLES[name][1] if name in TAIDAN_MOODS else {}), **(TOURON_SAMPLES[name][1] if name in TOURON_MOODS else {}),
+                  **(SOZAI_SAMPLES[name][1] if name in SOZAI_MOODS else {}))
         out.append((name, desc, m, group, lines, fx))
     for base, tint, metal, label in KAISAN_VARIANTS:
         vid = f'{base}_{tint}' + ('_metal' if metal else '')
@@ -4160,7 +4300,7 @@ def _nhk_status(name, m):
     if (name == 'ikari' or name in KAITEN_MOODS or name in PARODY_MOODS or name in KAISAN_MOODS
             or name in ('yontaku_nhk', 'mondai_nhk')):      # 3D 回転・4択の NHK 版・パロディ用は 11-07 に候補へ（ユーザー）
         return 'use'
-    if name in VARIETY_MOODS or name in NEWS_MOODS or name in QUIZ_MOODS or name in GAITOU_MOODS or name in TAIDAN_MOODS or name in TOURON_MOODS:
+    if name in VARIETY_MOODS or name in NEWS_MOODS or name in QUIZ_MOODS or name in GAITOU_MOODS or name in TAIDAN_MOODS or name in TOURON_MOODS or name in SOZAI_MOODS:
         return 'tbd'
     return 'ok'
 
@@ -4196,6 +4336,8 @@ def _card_sample(name, m):
         return TAIDAN_SAMPLES[name][0], None
     if name in TOURON_SAMPLES:
         return TOURON_SAMPLES[name][0], None
+    if name in SOZAI_SAMPLES:
+        return SOZAI_SAMPLES[name][0], None
     return BASIC_SAMPLES.get(name, [('受信料の', 'w'), ('使い道', m.get('color', 'y'))]), None
 
 
