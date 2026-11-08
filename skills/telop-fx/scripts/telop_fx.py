@@ -584,6 +584,15 @@ def st_jouhou_name(C, key):
                            tag_fill=_PINK, tag_ink=WHITE, tag_edge=_PINK, tag_kind='tab', tag_r=0), shadow=dict(dx=0, dy=.02, blur=.02, a=.15))
 
 
+def st_doc(C, key):
+    """ドキュメンタリー番組の題字（2026-11-08。大型ドキュメンタリーのタイトルの作りの族）：白い明朝＋暗いにじみ（光らせない＝白い光は読めない 11-07）。
+    肩書き（上の小さい行）・副題（下の「〜…〜」）は fx の sizes（行ごとの大きさ）と fonts（行ごとの書体）で"""
+    F = [(0, WHITE), (1, (238, 240, 246))] if key == 'w' else soft_fill(C)
+    return dict(font='mincho', bold=.004, track=.04, fill=F,
+                glows=[dict(color=(0, 0, 0), r=.22, a=.5), dict(color=(8, 12, 22), r=.07, a=.45)],
+                shadow=dict(dx=0, dy=.025, blur=.035, a=.55))
+
+
 # ---- 選挙特番の題字（2026-11-07。NHK の「衆議院解散」の題字の年ごとの変遷＝2005〜2026 年の 8 つから、作りの族と色だけを写した）
 #      行の色は使わない（年ごとに色が決まっている）。書体は W9／W8 と明朝で代用
 _GOLD_FOLD = [(0, (255, 250, 210)), (.3, (255, 226, 120)), (.48, (236, 180, 40)), (.53, (170, 110, 10)), (.8, (240, 196, 70)), (1, (150, 96, 10))]
@@ -732,6 +741,7 @@ STYLES = {
     'kaisetsu': ('解説番組の見出し（行ごとの斜めの帯＋星形の札）', st_kaisetsu),
     'jouhou_title': ('朝の情報番組の題名（ピンクの縁の白い札）', st_jouhou_title),
     'jouhou_name': ('朝の情報番組の名前の札（ピンクのタブ＋色の縦じま）', st_jouhou_name),
+    'doc': ('ドキュメンタリー番組の題字（白い明朝＋暗いにじみ）', st_doc),
     'gaitou': ('色の太明朝（色のグラデ＋白い縁＋濃い外縁＋厚み。白は黒い縁）', st_gaitou),
     'gaitou_go': ('太いゴシック（白い字＋黒い太縁＋黒いにじみ。色の字は太明朝と同じ重ね）', st_gaitou_go),
     'gaitou_sub': ('話し言葉の字幕（色の字＋白い細縁＋同じ色の光。白い字は edge の色）', st_gaitou_sub),
@@ -993,6 +1003,14 @@ def in_cut(t, S, T):
     pass
 
 
+def in_doc(t, S, T):
+    """ゆっくり浮かぶ：ぼけから焦点が合いながら、少し大きいところから戻る（光らせない・ドキュメンタリーの題字）"""
+    S.sx = S.sy = 1 + .06 * (1 - eo(t))
+    b = 14 * (1 - eo(t))
+    S.blur = (b, b)
+    S.a = min(1, t * 1.6)
+
+
 # ---- グロー系の出方（2026-11-06）：動き（base フレーム）のあいだは真っ白に光る塊のまま入り、着いてから cool フレームで色に冷める。
 # 見本の実測：動き 約8〜10フレーム＋冷め 約8フレーム（30fps）
 def glow_wrap(base_fn, base, cool=8, blur=.13, after=None):
@@ -1101,6 +1119,7 @@ BLOCK_IN = {
     'shake': ('震えながら', 12, in_shake),
     'swing': ('振り子で止まる', 16, in_swing),
     'cut': ('動きなし（0フレーム目から完成形）', 0, in_cut),
+    'doc_in': ('ゆっくり浮かぶ（ぼけから焦点が合う・ドキュメンタリーの題字）', 24, in_doc),
     'glow_wipe_l': ('グロー・ワイプ（左から白く光って色に冷める）', _GW_LN, _GW_L),
     'glow_wipe_c': ('グロー・ワイプ（中央から開く）', _GW_CN, _GW_C),
     'glow_slam': ('グロー・飛び込み（大きな白い塊が縮んで着地・後ろに余韻）', _GSLAM_N, _GSLAM),
@@ -1350,6 +1369,7 @@ MOODS = {
     'kaisetsu': ('解説番組の見出し（行ごとの斜めの帯・星形の札は tag）', dict(style='kaisetsu', **{'in': 'cut'}, hold='none', color='w')),
     'jouhou_title': ('朝の情報番組の題名（ピンクの縁の白い札・要の語は赤）', dict(style='jouhou_title', **{'in': 'cut'}, hold='none', color='k')),
     'jouhou_name': ('朝の情報番組の名前の札（ピンクのタブ tag＝所属・色の縦じま）', dict(style='jouhou_name', **{'in': 'cut'}, hold='none', color='k')),
+    'doc_title': ('ドキュメンタリー番組の題字（白い明朝・肩書きと副題は sizes と fonts）', dict(style='doc', **{'in': 'doc_in'}, hold='grow', out='fade', color='w')),
     # 選挙特番の題字（2026-11-07）：年ごとの「衆議院解散」の題字の作り。行の色＝黄で元のまま・白で銀・ほかの色でその色の光と縁
     **{f'kaisan_{y}': (f'選挙特番の題字 {y} 年の作り（NHK の衆議院解散の題字）', dict(style=f'tokuban_{y}', **{'in': 'pop'}, hold='none', color='y'))
        for y in ('2005', '2009', '2012', '2014', '2017', '2021', '2024', '2026')},
@@ -1395,7 +1415,8 @@ VARIETY_MOODS = ('jimaku', 'honne', 'tsumeyori', 'kyouchou', 'dokuhaku', 'narrat
 NEWS_MOODS = ('news_jimaku', 'news_obi', 'news_kyouchou', 'news_fuda')
 KAITEN_MOODS = ('kaiten_tate', 'kaiten_yoko', 'kaiten_gin', 'kaiten_pop')
 QUIZ_MOODS = ('yontaku', 'yontaku_kin', 'mondai', 'yontaku_nhk', 'mondai_nhk')
-PARODY_MOODS = ('sokuho_flash', 'sokuho_head', 'news_head', 'news_cap', 'news_corner', 'news_basho', 'kaisetsu', 'jouhou_title', 'jouhou_name')
+PARODY_MOODS = ('sokuho_flash', 'sokuho_head', 'news_head', 'news_cap', 'news_corner', 'news_basho', 'kaisetsu', 'jouhou_title', 'jouhou_name',
+                'doc_title')
 KAISAN_MOODS = tuple(f'kaisan_{y}' for y in TOKUBAN_YEARS)
 # 見本の文言は本物のニュースと取り違えないもの（作り話のニュースを書かない）
 PARODY_SAMPLES = {
@@ -1408,6 +1429,8 @@ PARODY_SAMPLES = {
     'kaisetsu': ([('元職員が解説', 'w'), ('受信料のギモン', 'k'), ('その答えは', 'w')], {'tag': '緊急解説', 'paint': {'ギモン': 'r'}}),
     'jouhou_title': ([('受信料の 素朴なギモン', 'k'), ('元NHK職員が答えます…', 'k')], {'paint': {'素朴なギモン': 'r'}}),
     'jouhou_name': ([('ある元NHK職員', 'k')], {'tag': '解説'}),
+    'doc_title': ([('ドキュメント 公共放送', 'w'), ('受信料', 'w'), ('崩壊の足音', 'w'), ('〜公共放送は誰のものか〜', 'w')],
+                  {'sizes': [.34, 1, 1, .4], 'fonts': ['W8']}),
 }
 QUIZ_SAMPLES = {'yontaku': ([('受信料は 月いくら？', 'w'), ('1100円', 'w'), ('2200円', 'w'), ('550円', 'w'), ('無料', 'w')], {'pick': 'C', 'answer': 'A'}),      # 地上契約・口座振替の月額（2023-10〜）
                 'yontaku_kin': ([('NHKの会長を 選ぶのは？', 'w'), ('経営委員会', 'w'), ('総理大臣', 'w'), ('国会', 'w'), ('視聴者', 'w')], {'answer': 'A'}),       # 会長は経営委員会が任命（放送法52条）
@@ -1602,6 +1625,12 @@ def resolve_fx(fx):
             if not isinstance(v, (int, float)) or not .3 <= v <= 2.5:
                 raise SystemExit(f'telop_fx: size_words の「{w}」の倍率「{v}」は 0.3〜2.5 の数')
         fx['size_words'] = dict(sw_)
+    sz_ = fx.get('sizes')
+    if sz_ is not None and not (isinstance(sz_, (list, tuple)) and all(v is None or (isinstance(v, (int, float)) and .2 <= v <= 2.5) for v in sz_)):
+        raise SystemExit('telop_fx: sizes は行ごとの大きさの倍率の並び（例 [0.34, 1, 1, 0.4]・0.2〜2.5）')
+    fo_ = fx.get('fonts')
+    if fo_ is not None and not (isinstance(fo_, (list, tuple)) and all(v is None or isinstance(v, str) for v in fo_)):
+        raise SystemExit('telop_fx: fonts は行ごとの書体の並び（例 ["W8"]・省いた行は型の書体。W9・W8・W7・W6・mincho・maru）')
     if fx.get('tint') is not None and fx['tint'] not in BASE:
         raise SystemExit(f'telop_fx: tint の色「{fx["tint"]}」は知らない（{", ".join(BASE)}）')
     if fx.get('metal') is not None and not isinstance(fx['metal'], bool):
@@ -1736,6 +1765,23 @@ def _is_hira(ch):
     return 'ぁ' <= ch <= 'ゖ'
 
 
+def _restack(item, sizes, gap=.24):
+    """sizes：行ごとの字の大きさの倍率。見た目の行の間（字の上下の余白を除いた隙間）が、隣り合う大きいほうの字の gap 倍になるよう積み直す（まとまりの中心は元のまま）"""
+    ls = item['lines']
+    s = [float(sizes[i]) if i < len(sizes) and sizes[i] else 1.0 for i in range(len(ls))]
+    tops = [l['baseline'] - .88 * l['px'] for l in ls]
+    bots = [l['baseline'] + .12 * l['px'] for l in ls]
+    cy = (min(tops) + max(bots)) / 2
+    px = [l['px'] * k for l, k in zip(ls, s)]
+    gaps = [gap * max(px[i], px[i + 1]) - .12 * (px[i] + px[i + 1]) for i in range(len(ls) - 1)]   # 字の上下の余白はおよそ字の 12％ずつ
+    y = cy - (sum(px) + sum(gaps)) / 2
+    out = []
+    for i, l in enumerate(ls):
+        out.append(dict(l, px=px[i], baseline=y + .88 * px[i]))
+        y += px[i] + (gaps[i] if i < len(gaps) else 0)
+    return dict(item, lines=out)
+
+
 class FxTelop:
     """テロップ1つ分。frame(f) で全画面（透明背景）の1枚を返す。
 
@@ -1760,6 +1806,8 @@ class FxTelop:
         self.W, self.H = L['W'], L['H']
         self.fx = resolve_fx(item.get('fx') or {})
         self.mode = mode
+        if mode == 'chars' and self.fx.get('sizes'):
+            item = self.it = _restack(item, self.fx['sizes'])    # 行ごとの大きさ（肩書き・副題を小さく）。行の間も詰め直す
         self.own = own_stroke              # 装飾のとき：文字クリップ自身の縁取り（px）。これより内側の縁は描かない
         self.seed = sum(map(ord, ''.join(l['text'] for l in item['lines']))) + 17
         self.f = 0
@@ -1771,6 +1819,9 @@ class FxTelop:
         self._over = over
         self._stc = {}
         self.styles = [self._style(l.get('color', self.fx.get('color', 'w'))) for l in item['lines']]
+        fo = self.fx.get('fonts') if mode == 'chars' else None
+        if fo:                                       # 行ごとの書体（肩書きだけゴシックに）
+            self.styles = [dict(st, font=fo[i]) if i < len(fo) and fo[i] else st for i, st in enumerate(self.styles)]
         self._layout()
         self._sprites()
         self._plate()
@@ -2573,7 +2624,7 @@ def _persp_coeffs(dst, src):
 
 class Kaiten:
     """3D 回転テロップ。item の行＝柱の面（2行なら 1・2 面目、3・4 面目はその繰り返し）。
-    fx：axis（y＝縦の柱・縦書き／x＝横の帯・横書き）・turn_at（面が替わる秒の並び。なければ各行の出る時刻＝anchor、それもなければ等分）・
+    fx：axis（y＝縦の柱・縦書き／x＝横の帯・横書き）・turn_at（面が替わる秒の並び。なければ各行の出る時刻＝anchor、それもなければ等分）・repeat（true で面の字を 4 面に繰り返す＝2行で行き来させるとき。peek と違い向きは変えない）・final_front（true で最後の面は回り終わりに真正面で止める）・final_grow（倍率。最後の面が回り終わったら 8 フレームでぐいっと大きく）・
     yaw（止まったときの斜めの角度・既定 16 度＝左の面が見え、次の面は見えない）・peek（真なら次の面を横にのぞかせる＝見本の動画と同じ向き）・
     in（kaiten_in＝回りながら出る／cut）"""
     TURN = 12                                          # 1 面ぶん回るフレーム数
@@ -2677,8 +2728,9 @@ class Kaiten:
         self.cs, self.fw, self.fh = cs, fw, fh
         faces = [self._face_img(t, c, fw, fh, cs) for t, c in texts]
         peek = self.fx.get('peek')
-        while len(faces) < 4:                           # 使わない面：peek なら字の面の繰り返し、ふだんは無地（次の答えを先に見せない）
-            faces.append(faces[len(faces) % len(texts)] if peek else self._face_img('', texts[0][1], fw, fh, cs))
+        rep = self.fx.get('repeat')                     # 2026-11-07 不払い違法編：面の繰り返し（行は2つのまま turn_at を3回にして 赤→青→赤→青 と行き来させる）
+        while len(faces) < 4:                           # 使わない面：peek・repeat なら字の面の繰り返し、ふだんは無地（次の答えを先に見せない）
+            faces.append(faces[len(faces) % len(texts)] if (peek or rep) else self._face_img('', texts[0][1], fw, fh, cs))
         self.faces = faces[:4] if len(texts) <= 4 else faces
         if self.axis == 'x':                            # 横の帯：面を縦にして縦の柱として描き、最後に絵ごと戻す
             self.faces = [f.rotate(-90, expand=True) for f in self.faces]
@@ -2715,6 +2767,15 @@ class Kaiten:
                 yaw -= 90
             elif t > 0:
                 yaw -= 90 * back(t, 1.5)
+        if self.fx.get('final_front') and self.at:      # 2026-11-07 不払い違法編：最後の面は回り終わりに真正面（斜めの rest をやめる）
+            t = (f - self.at[-1]) / self.TURN
+            if t > 0:
+                yaw -= rest * min(1.0, t)
+        fg = self.fx.get('final_grow')                  # 2026-11-07 不払い違法編：最後の面が正面に来たら、ぐいっと大きく（倍率。1.3 など）
+        if fg and self.at:
+            t = (f - self.at[-1] - self.TURN) / 8         # 回り終わってから 8 フレームで、少し行き過ぎて戻る
+            if t > 0:
+                sc *= 1 + (float(fg) - 1) * back(min(1.0, t), 1.8)
         return yaw, sc, a
 
     # ---- 描く
@@ -2728,7 +2789,7 @@ class Kaiten:
         cap_o, cap_h = aw * .1, aw * .3                            # ふたのはみ出し・厚み
         pitch = math.radians(-10)
         D = hh * 7
-        size = int((max(aw, hh) * 2.6 + cap_h * 2) * S)
+        size = int((max(aw, hh) * 2.6 + cap_h * 2) * S * max(1.0, sc))   # final_grow で大きくしても切れないように
         cv = Image.new('RGBA', (size, size), (0, 0, 0, 0))
         c0 = size / 2
         cyw, syw = math.cos(math.radians(yaw)), math.sin(math.radians(yaw))
@@ -3554,6 +3615,8 @@ def main():
     p.add_argument('--edge', default=None, help='色の要（色キー。jimaku・news_jimaku＝話し手の縁、news_obi＝帯、news_fuda＝字とタブ）')
     p.add_argument('--tag', default=None, help='札の文字（news_obi の「妻」・news_fuda の「料金」）')
     p.add_argument('--box', default=None, help='語を色の箱に「語=色,語=色」（news_jimaku の要の語）')
+    p.add_argument('--sizes', default=None, help='行ごとの大きさの倍率（例 0.34,1,1,0.4。doc_title の肩書き・副題）')
+    p.add_argument('--fonts', default=None, help='行ごとの書体（例 W8,,,＝1行目だけゴシック）')
     p.add_argument('--layout', default='vertical', choices=list(LAYOUTS))
     a = ap.parse_args()
     if a.cmd == 'list':
@@ -3595,6 +3658,10 @@ def main():
     fx = resolve_fx(a.fx)
     if a.paint:
         fx['paint'] = a.paint
+    if a.sizes:
+        fx['sizes'] = [float(v) if v else None for v in a.sizes.split(',')]
+    if a.fonts:
+        fx['fonts'] = [v or None for v in a.fonts.split(',')]
     if a.glow:
         fx['glow'] = a.glow
     if a.edge:

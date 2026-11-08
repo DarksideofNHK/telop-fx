@@ -1,6 +1,6 @@
 ---
 name: telop-fx
-description: 動画にテレビのバラエティ・ニュース風の「決めテロップ」を入れる。90 種の見た目（多重の縁・グラデーション・金属・ネオン・爆発の台座・3D 回転・4択クイズのパネル・ニュースの帯・街頭インタビュー風の字幕・選挙特番風の題字ほか）から気分の名前で選び、文字ごと焼き込んだ動画（mp4）か、編集ソフトに重ねる透明つきの動画（ProRes 4444 .mov）・止め絵（PNG）を作る。使用場面 (1) この動画の○秒に「…」をテロップで入れて、(2) 派手なテロップ・決めテロップ・テロップの装飾を作りたい、(3) テロップの見本・カタログを見たい・選びたい、(4) 透明のテロップ素材を Premiere・Final Cut・DaVinci に重ねたい。トリガー "テロップを入れて", "テロップを焼き込んで", "決めテロップ", "派手なテロップ", "テロップの見本", "テロップカタログ", "telop", "/telop-fx"
+description: 動画にテレビのバラエティ・ニュース風の「決めテロップ」を入れる。91 種の見た目（多重の縁・グラデーション・金属・ネオン・爆発の台座・3D 回転・4択クイズのパネル・ニュースの帯・街頭インタビュー風の字幕・選挙特番風の題字ほか）から気分の名前で選び、文字ごと焼き込んだ動画（mp4）か、編集ソフトに重ねる透明つきの動画（ProRes 4444 .mov）・止め絵（PNG）を作る。使用場面 (1) この動画の○秒に「…」をテロップで入れて、(2) 派手なテロップ・決めテロップ・テロップの装飾を作りたい、(3) テロップの見本・カタログを見たい・選びたい、(4) 透明のテロップ素材を Premiere・Final Cut・DaVinci に重ねたい。トリガー "テロップを入れて", "テロップを焼き込んで", "決めテロップ", "派手なテロップ", "テロップの見本", "テロップカタログ", "telop", "/telop-fx"
 ---
 
 # telop-fx：動画に決めテロップを入れる
@@ -11,7 +11,7 @@ description: 動画にテレビのバラエティ・ニュース風の「決め�
 
 - **動画に焼き込む**：動画と「何秒から何秒に、どの文字を、どの気分で」を並べた JSON から、テロップ入りの mp4 を作る（音はそのまま）
 - **素材だけ作る**：1 本のテロップを、透明つきの動画（.mov・ProRes 4444）か止め絵（.png）にする。編集ソフトのタイムラインに重ねて使う
-- **見本を作り直す**：90 枚のカード（見本の動画・止め絵）と一覧ページ
+- **見本を作り直す**：91 枚のカード（見本の動画・止め絵）と一覧ページ
 
 縦（1080×1920）と横（1920×1080）のどちらにも使える。動画の向きで自動で選ぶ。
 
@@ -47,7 +47,7 @@ python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py render --text '受信料/�
 python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py render --text スクランブル化 --color y --fx kaisan_2026 --out a.png
 ```
 
-`--layout horizontal` で横の画面。`--paint 語=色`・`--tag`・`--edge`・`--box` も使える。
+`--layout horizontal` で横の画面。`--paint 語=色`・`--tag`・`--edge`・`--box`・`--sizes 0.34,1,1,0.4`・`--fonts W8` も使える。
 
 ## 気分（よく使うもの）
 
@@ -65,6 +65,7 @@ python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py render --text スクラン
 | ニュース番組風 | `news_head`・`news_cap`・`kaisetsu`・`jouhou_title` |
 | 選挙特番風の題字 | `kaisan_2005`〜`kaisan_2026`（`tint` で色、`metal: true` で字も金属） |
 | 写真の横の「実際の○○」 | `tatefuda` |
+| ドキュメンタリー番組の題字 | `doc_title`（`"sizes": [0.34, 1, 1, 0.4]`・`"fonts": ["W8"]` で、上の肩書きと下の「〜…〜」の副題を小さく。`y` は画面の中ほど＝縦 960・横 540） |
 
 全部の名前と見た目はカタログで。カタログの「NHK」の区分は、作者が NHK 系の動画で使うかどうかの使い分け（読みやすさ・点滅しないかで決めた）。
 
@@ -83,6 +84,6 @@ python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py render --text スクラン
 ## カタログを作り直す
 
 ```bash
-python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py cards            # 90 枚の見本（catalog/。TELOP_CATALOG_DIR で場所を替えられる）
+python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py cards            # 91 枚の見本（catalog/。TELOP_CATALOG_DIR で場所を替えられる）
 python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py list             # 型・動き・気分の一覧
 ```
