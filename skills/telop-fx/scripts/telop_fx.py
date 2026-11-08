@@ -693,6 +693,39 @@ def st_news_jikoku(C, key):
                 shadow=dict(dx=.02, dy=.03, blur=.02, a=.6))
 
 
+# ---- ビジネス対談風（2026-11-08。ビジネス系の対談番組の字幕から、作りの族と出方だけを写した。番組名・ロゴ・ワイプの丸い顔・枠は描かない）
+#      帯は紫から青への横のグラデーション。出方は「左に細い縦の線が出て、帯が右へ伸びる」（obi_wipe・9 コマ）。ほかは cut
+_TD_PURPLE, _TD_BLUE = (170, 40, 236), (40, 130, 206)
+
+
+def st_taidan(C, key):
+    """対談の字幕の帯：白＝紫→青の帯に白い字／紫＝白い帯に紫→青の字／黒＝黒い箱に白い字。行ごとの帯・行は左揃え"""
+    base = dict(font='W8', track=.01, row_gap=.12, row_l=True)
+    if key == 'k':
+        return dict(base, fill=[(0, WHITE), (1, WHITE)], plate=dict(kind='bar', per_line=True, fill=[(0, (8, 8, 10)), (1, (8, 8, 10))], pad=(.25, .1), fit_pad=True))
+    if key in ('v', 'b', 'p', 'c'):
+        return dict(base, fill=[(0, _TD_PURPLE), (1, _TD_PURPLE)], hgrad=(_TD_PURPLE, _TD_BLUE),
+                    plate=dict(kind='bar', per_line=True, fill=[(0, WHITE), (1, WHITE)], pad=(.25, .1), fit_pad=True))
+    T_ = (255, 236, 60) if key == 'y' else WHITE
+    return dict(base, fill=[(0, T_), (1, T_)], plate=dict(kind='hband', per_line=True, colors=(_TD_PURPLE, _TD_BLUE), pad=(.25, .1), fit_pad=True))
+
+
+def st_taidan_midashi(C, key):
+    """左上の話題の札：紫→青の帯に白い字（画面の左の端にくっつける）"""
+    return dict(font='W8', fill=[(0, WHITE), (1, WHITE)], plate=dict(kind='hband', colors=(_TD_PURPLE, _TD_BLUE), pad=(.35, .2), fit_pad=True))
+
+
+def st_taidan_namae(C, key):
+    """名前：白い太字＋やわらかい影（上の肩書きは sizes で小さく）"""
+    return dict(font='W8', fill=[(0, WHITE), (1, WHITE)], glows=[dict(color=(40, 0, 60), r=.12, a=.35)],
+                shadow=dict(dx=.015, dy=.03, blur=.03, a=.45))
+
+
+def st_taidan_shashin(C, key):
+    """写真の見出し：白い板に黒い字（写真のスライドの左上）"""
+    return dict(font='W7', fill=[(0, INK), (1, INK)], plate=dict(kind='bar', fill=[(0, WHITE), (1, WHITE)], pad=(.4, .2), fit_pad=True))
+
+
 def st_doc(C, key):
     """ドキュメンタリー番組の題字（2026-11-08。大型ドキュメンタリーのタイトルの作りの族）：白い明朝＋暗いにじみ（光らせない＝白い光は読めない 11-07）。
     肩書き（上の小さい行）・副題（下の「〜…〜」）は fx の sizes（行ごとの大きさ）と fonts（行ごとの書体）で"""
@@ -851,6 +884,11 @@ STYLES = {
     'jouhou_title': ('朝の情報番組の題名（ピンクの縁の白い札）', st_jouhou_title),
     'jouhou_name': ('朝の情報番組の名前の札（ピンクのタブ＋色の縦じま）', st_jouhou_name),
     'doc': ('ドキュメンタリー番組の題字（白い明朝＋暗いにじみ）', st_doc),
+    'taidan': ('対談の字幕の帯（白＝紫→青の帯・紫＝白い帯に紫→青の字・黒＝黒い箱）', st_taidan),
+    'taidan_midashi': ('左上の話題の札（紫→青の帯に白い字）', st_taidan_midashi),
+    'taidan_namae': ('名前（白い太字＋やわらかい影）', st_taidan_namae),
+    'taidan_shashin': ('写真の見出し（白い板に黒い字）', st_taidan_shashin),
+    'taidan_profile': ('ゲストプロフィールの板（紫→青の板・肩書き・名前・白い板の紹介文）', lambda C, key: st_taidan_namae(C, key)),
     'kouhou': ('広報の告知の字（黒い中太・白＝灰色の肩書き・黄＝下に黄色い線）', st_kouhou),
     'kouhou_fuki': ('広報の吹き出し（赤い板に白い字・下にしっぽ）', st_kouhou_fuki),
     'kouhou_arc': ('弧に並ぶ字（広報の「よろしくお願いします」）', st_kouhou_arc),
@@ -881,7 +919,7 @@ STYLES = {
     'tokuban_2024': ('選挙特番の題字 2024（白から金の細めの明朝＋金の厚み）', st_tokuban_2024),
     'tokuban_2026': ('選挙特番の題字 2026（金の明朝＋赤い縁＋赤い光）', st_tokuban_2026),
 }
-MULTI_LINE_FX = ('yontaku', 'jikanwari')       # 3 行を超えてよい決めテロップ（build_premiere が控えの文字クリップを 3 行までにする）
+MULTI_LINE_FX = ('yontaku', 'jikanwari', 'taidan_profile')       # 3 行を超えてよい決めテロップ（build_premiere が控えの文字クリップを 3 行までにする）
 
 
 def style_of(name, key, over=None):
@@ -1125,6 +1163,12 @@ def in_cut(t, S, T):
     pass
 
 
+def in_obi_wipe(t, S, T):
+    """帯が左から伸びる：はじめ細い縦の線、ゆっくり出て速く伸び、右の端でゆっくり止まる（ふちはくっきり・光らない）"""
+    t = clamp(t)
+    S.wipe = (t * t * (3 - 2 * t), 'h')
+
+
 def in_doc(t, S, T):
     """ゆっくり浮かぶ：ぼけから焦点が合いながら、少し大きいところから戻る（光らせない・ドキュメンタリーの題字）"""
     S.sx = S.sy = 1 + .06 * (1 - eo(t))
@@ -1242,6 +1286,7 @@ BLOCK_IN = {
     'swing': ('振り子で止まる', 16, in_swing),
     'cut': ('動きなし（0フレーム目から完成形）', 0, in_cut),
     'doc_in': ('ゆっくり浮かぶ（ぼけから焦点が合う・ドキュメンタリーの題字）', 24, in_doc),
+    'obi_wipe': ('帯が左から伸びる（細い縦の線から右へ・字は帯と一緒に見える。対談の字幕）', 9, in_obi_wipe),
     'glow_wipe_l': ('グロー・ワイプ（左から白く光って色に冷める）', _GW_LN, _GW_L),
     'glow_wipe_c': ('グロー・ワイプ（中央から開く）', _GW_CN, _GW_C),
     'glow_slam': ('グロー・飛び込み（大きな白い塊が縮んで着地・後ろに余韻）', _GSLAM_N, _GSLAM),
@@ -1507,6 +1552,15 @@ MOODS = {
     'news_vtr': ('映像の右上の字幕（2行・下の場所は tag）', dict(style='news_vtr', **{'in': 'cut'}, hold='none', color='k', align='r')),
     'news_satsuei': ('撮影の札（右下・名前）', dict(style='news_satsuei', **{'in': 'cut'}, hold='none', color='k', align='r')),
     'news_jikoku': ('時刻（左上）', dict(style='news_jikoku', **{'in': 'cut'}, hold='none', color='w', align='l')),
+    # ビジネス対談風（2026-11-08）：帯は左から伸びる（obi_wipe）、ほかは cut。プロフィールは順に浮かぶ
+    'taidan_obi': ('対談の字幕の帯（紫→青の帯・左から伸びる）', dict(style='taidan', **{'in': 'obi_wipe'}, hold='none', color='w')),
+    'taidan_2dan': ('対談の字幕 2段（1行目＝帯・2行目＝白い帯に紫→青の字）', dict(style='taidan', **{'in': 'obi_wipe'}, hold='none', color='w')),
+    'taidan_kuro': ('黒い箱の字幕（問い・ナレーション）', dict(style='taidan', **{'in': 'cut'}, hold='none', color='k')),
+    'taidan_midashi': ('左上の話題の札（紫→青の帯）', dict(style='taidan_midashi', **{'in': 'cut'}, hold='none', color='w', align='l')),
+    'taidan_namae': ('名前（肩書き＋名前・白い太字）', dict(style='taidan_namae', **{'in': 'cut'}, hold='none', color='w', align='l')),
+    'taidan_shashin': ('写真の見出し（白い板に黒い字・左上）', dict(style='taidan_shashin', **{'in': 'cut'}, hold='none', color='k', align='l')),
+    'taidan_profile': ('ゲストプロフィールの板（1行目＝肩書き・2行目＝名前・3行目から紹介文）',
+                       dict(style='taidan_profile', **{'in': 'cut'}, hold='none', color='w')),
     'doc_title': ('ドキュメンタリー番組の題字（白い明朝・肩書きと副題は sizes と fonts）', dict(style='doc', **{'in': 'doc_in'}, hold='grow', out='fade', color='w')),
     # 選挙特番の題字（2026-11-07）：年ごとの「衆議院解散」の題字の作り。行の色＝黄で元のまま・白で銀・ほかの色でその色の光と縁
     **{f'kaisan_{y}': (f'選挙特番の題字 {y} 年の作り（NHK の衆議院解散の題字）', dict(style=f'tokuban_{y}', **{'in': 'pop'}, hold='none', color='y'))
@@ -1680,6 +1734,17 @@ def catalog_kaisan(out):
     return _grid_video(cells, Path(out) / '見本_11_選挙特番の題字.mp4', '選挙特番の題字（年ごと・2026-11-07）', sec=2.6)
 
 
+TAIDAN_MOODS = ('taidan_obi', 'taidan_2dan', 'taidan_kuro', 'taidan_midashi', 'taidan_namae', 'taidan_shashin', 'taidan_profile')
+TAIDAN_SAMPLES = {
+    'taidan_obi': ([('受信料は払うべきなのか', 'w')], {}),
+    'taidan_2dan': ([('契約の義務は法律にあるが', 'w'), ('支払いは規約で決まる', 'v')], {}),
+    'taidan_kuro': ([('なぜ受信料は高いのか', 'k')], {}),
+    'taidan_midashi': ([('受信料のゆくえ', 'w')], {}),
+    'taidan_namae': ([('元NHK職員', 'w'), ('ある元職員', 'w')], {'sizes': [.55, 1]}),
+    'taidan_shashin': ([('東京都渋谷区　放送センター', 'k')], {}),
+    'taidan_profile': ([('元NHK職員', 'w'), ('ある元職員', 'w'), ('NHKで営業と番組制作に', 'k'), ('長く携わる。受信料の', 'k'),
+                        ('しくみを内側から解説する。', 'k')], {'tag': 'ゲストプロフィール'}),
+}
 GAITOU_MOODS = ('gaitou_aka', 'gaitou_ao', 'gaitou_shiro', 'gaitou_mix', 'gaitou_futairo', 'gaitou_sub', 'gaitou_sub_w', 'gaitou_staff',
                 'gaitou_obi', 'gaitou_q', 'gaitou_kado', 'tatefuda')
 # 見本の文言（行, 色）と、ほかの fx の値。街の人の声の形だが、実在の人の発言ではない一般的な言い回し
@@ -1838,6 +1903,13 @@ def fx_as_xml(spec):
         out['motion'] = 'none'
         out.setdefault('box', False)
         return out
+    if fx['style'] == 'taidan_profile':            # プロフィールの板は XML では板にできない＝肩書きと名前の 2 行だけ（2026-11-08）
+        if isinstance(out.get('lines'), list):
+            out['lines'] = out['lines'][:2]
+        out['deco'] = None
+        out['motion'] = 'none'
+        out.setdefault('box', False)
+        return out
     if fx['style'] == 'jikanwari':                 # 時間割の帯は XML では帯にできない＝「時刻 区間」を 3 つずつ並べた 2 行までの字（2026-11-08）
         ls = out.get('lines') if isinstance(out.get('lines'), list) else []
         if ls:
@@ -1974,6 +2046,8 @@ class FxTelop:
             return JikanWari(item, L, n)               # 時間割の帯も別の描き手
         if st_ == 'kouhou_arc':
             return ArcText(item, L, n)                 # 弧に並ぶ字も別の描き手
+        if st_ == 'taidan_profile':
+            return TaidanProfile(item, L, n)           # ゲストプロフィールの板も別の描き手
         return super().__new__(cls)
 
     def __init__(self, item, L, n, mode='chars', own_stroke=None):
@@ -2124,6 +2198,8 @@ class FxTelop:
             base = cy0 + (ln['baseline'] - cy0) * k       # まとまりの中心を軸に同じ倍率で
             x = self.W / 2 - w / 2
             al = self.fx.get('align')
+            if st.get('row_l') and al not in ('l', 'r') and self.mode == 'chars':   # row_l：まとまりは真ん中、行は左揃え（対談の 2 段の帯）
+                x = self.W / 2 - max(w_ for (_, _, _, w_, _) in rows) / 2
             if al in ('l', 'r') and self.mode == 'chars':  # 左寄せ・右寄せ（右上の札・字幕の帯）：まとまりごと寄せ、行は中で左揃え
                 pl_ = st.get('plate') or {}
                 off = max(self._outer(st_, px_) + (pl_.get('pad', (0, 0))[0] * px_ if pl_ else 0)
@@ -2215,6 +2291,10 @@ class FxTelop:
             else:
                 fm = mask(bold)
                 fill = st['fill_fn'](u.idx) if st.get('fill_fn') else st['fill']
+                if st.get('hgrad'):                          # 横のグラデーションの字：行の中の位置で字ごとに色を替える（対談の白い帯の字）
+                    r_ = self.rows[u.line]
+                    c_ = mix(st['hgrad'][0], st['hgrad'][1], clamp((u.x + u.adv / 2 - r_['x0']) / max(1.0, r_['x1'] - r_['x0'])))
+                    fill = [(0, c_), (1, c_)]
                 img = paint(fm, fill, y0, y1)
                 bv = st.get('bevel', 0)
                 if bv:
@@ -2348,6 +2428,14 @@ class FxTelop:
                     d.ellipse([(cx_ - .85 * u) * S, (cy_ - .6 * u) * S, (cx_ + .85 * u) * S, (cy_ + 1.1 * u) * S], outline=WHITE + (255,), width=lw_)
             elif pl['kind'] == 'none':                          # none：台座なし（札 tag だけを出すため。スタッフの問い）
                 pass
+            elif pl['kind'] == 'hband':                         # hband：横のグラデーションの帯（対談の字幕・2026-11-08）
+                ca, cb = pl.get('colors', (_TD_PURPLE, _TD_BLUE))
+                gw, gh = max(1, int((x1 - x0) * S)), max(1, int((y1 - y0) * S))
+                g = Image.new('RGB', (2, 1))
+                g.putpixel((0, 0), tuple(ca))
+                g.putpixel((1, 0), tuple(cb))
+                g = g.resize((gw, gh), Image.BILINEAR).convert('RGBA')
+                img.alpha_composite(g, (int(x0 * S), int(y0 * S)))
             elif pl['kind'] == 'uline':                         # uline：uline の行の字の下に色の線（広報の窓口の札・2026-11-08）
                 if pl.get('panel'):                             # 後ろに白い角丸の板
                     d.rounded_rectangle([x0 * S, y0 * S, x1 * S, y1 * S], radius=em * .12 * S, fill=tuple(pl['panel']) + (245,))
@@ -2632,7 +2720,16 @@ class FxTelop:
         em = self.em
         x0, x1 = self.bx0 - self.rx0 - .1 * em, self.bx1 - self.rx0 + .1 * em
         y0, y1 = self.by0 - self.ry0 - .1 * em, self.by1 - self.ry0 + .1 * em
-        if S.wipe is not None:
+        if S.wipe is not None and S.wipe[1] == 'h':        # h：絵（台座も）の左の端から右の端まで、ふちはくっきり・光らない（対談の帯・2026-11-08）
+            fr = S.wipe[0]
+            w, h = self.rsize
+            bb = F.getchannel('A').getbbox() or (0, 0, w, h)
+            x = bb[0] + max(.07 * em, (bb[2] - bb[0]) * fr) if fr > 0 else bb[0]
+            m = Image.new('L', (w, h), 0)
+            ImageDraw.Draw(m).rectangle([0, 0, x, h], fill=255)
+            F = F.copy()
+            F.putalpha(ImageChops.multiply(F.getchannel('A'), m))
+        elif S.wipe is not None:
             fr, d = S.wipe
             w, h = self.rsize
             soft = .12 * em
@@ -3362,6 +3459,129 @@ class ArcText:
         return self.img.getbbox()
 
 
+# ---------------------------------------------------------------- ゲストプロフィールの板（2026-11-08・ビジネス対談風）
+# 紫→青の板（横の画面は左半分・縦は横いっぱいの帯）に、左上の白い札（fx の tag・既定「ゲストプロフィール」）・肩書き（1 行目）・名前（2 行目）・
+# 白い角丸の板の紹介文（3 行目から）。出方：板はカット → 札が左から伸び、肩書き → 名前 → 白い板 → 紹介文の順にフェードで浮かぶ（約 0.7 秒）
+def _hgrad_text(text, font, ca, cb, skew=0.0):
+    """横のグラデーションの字（透明つき）"""
+    w = int(font.getlength(text, **FEAT)) + 4
+    asc, desc = font.getmetrics()
+    m = Image.new('L', (w + int(abs(skew) * (asc + desc)) + 4, asc + desc + 4), 0)
+    ImageDraw.Draw(m).text((2, 2 + asc), text, font=font, fill=255, anchor='ls', **FEAT)
+    if skew:
+        m = m.transform(m.size, Image.AFFINE, (1, skew, -skew * (2 + asc), 0, 1, 0), resample=Image.BICUBIC)
+    g = Image.new('RGB', (2, 1))
+    g.putpixel((0, 0), tuple(ca))
+    g.putpixel((1, 0), tuple(cb))
+    g = g.resize(m.size, Image.BILINEAR).convert('RGBA')
+    g.putalpha(m)
+    return g
+
+
+class TaidanProfile:
+    STEPS = (('tag', 0, 10), ('title', 2, 8), ('name', 5, 11), ('box', 9, 15), ('bio', 13, 21))
+
+    def __init__(self, item, L, n):
+        self.it, self.L, self.n = item, L, max(1, n)
+        W, H = self.W, self.H = L['W'], L['H']
+        self.fx = resolve_fx(item.get('fx') or {})
+        lines = item['lines']
+        px = max(l['px'] for l in lines)
+        title = lines[0]['text'] if lines else ''
+        name = lines[1]['text'] if len(lines) > 1 else ''
+        bio = [l['text'] for l in lines[2:] if l['text'].strip()]
+        tag = self.fx.get('tag') or 'ゲストプロフィール'
+        horiz = W > H
+        sx0, sy0, sx1, sy1 = safe_rect(L)
+        xm = (W * .04) if horiz else sx0
+        iw = (W * .46 - xm) if horiz else (sx1 - sx0)
+        k = 1.0
+        for _ in range(8):                                  # 一番長い行が板の中に収まる大きさに
+            ts, ns, bs, gs = px * .5 * k, px * .85 * k, px * .34 * k, px * .42 * k
+            wide = max([fx_font('W8', ts).getlength(title, **FEAT), fx_font('W9', ns).getlength(name, **FEAT)]
+                       + [fx_font('W6', bs).getlength(b, **FEAT) + bs * 2.4 for b in bio] + [1])
+            if wide <= iw:
+                break
+            k *= iw / wide * .98
+        bpad = bs * 1.1
+        boxw = min(iw, max([fx_font('W6', bs).getlength(b, **FEAT) for b in bio] + [ns * 2]) + bpad * 2)
+        th = gs * 1.55
+        hgt = th + gs * .7 + ts * 1.25 + ns * 1.2 + ns * .3 + (len(bio) * bs * 1.6 + bpad * 1.6 if bio else 0)
+        if horiz:
+            y = H * .04
+            panel = (0, 0, int(W * .5), H)
+        else:
+            cy = sum(l['baseline'] - .38 * l['px'] for l in lines[:1]) if lines else H / 2
+            y = min(max(cy - hgt / 2, sy0), sy1 - hgt)
+            panel = (0, int(y - gs * 1.2), W, int(y + hgt + gs * 1.2))
+        g = Image.new('RGB', (2, 2))                        # 板：左下が紫、右上が青
+        for (px_, py_), c_ in (((0, 0), (122, 68, 232)), ((1, 0), (62, 108, 214)), ((0, 1), (176, 40, 240)), ((1, 1), (122, 68, 232))):
+            g.putpixel((px_, py_), c_)
+        self.panel = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        self.panel.alpha_composite(g.resize((panel[2] - panel[0], panel[3] - panel[1]), Image.BILINEAR).convert('RGBA'), (panel[0], panel[1]))
+        L_ = {}
+        # 札：白い板（板の左の端から）＋紫→青の斜めの字
+        t_img = _hgrad_text(tag, fx_font('W8', gs), _TD_PURPLE, _TD_BLUE, skew=.18)
+        im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        tx1 = int(xm + t_img.width + gs * .6)
+        d.rectangle([panel[0], int(y), tx1, int(y + th)], fill=WHITE + (255,))
+        im.alpha_composite(t_img, (int(xm), int(y + th / 2 - t_img.height / 2)))
+        L_['tag'] = (im, (panel[0], tx1))
+        y += th + gs * .7
+        im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(im).text((xm, y + ts * .9), title, font=fx_font('W8', ts), fill=WHITE + (255,), anchor='ls', **FEAT)
+        L_['title'] = (im, None)
+        y += ts * 1.25
+        im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(im).text((xm, y + ns * .9), name, font=fx_font('W9', ns), fill=WHITE + (255,), anchor='ls', **FEAT)
+        L_['name'] = (im, None)
+        y += ns * 1.2 + ns * .3
+        imb, imt = Image.new('RGBA', (W, H), (0, 0, 0, 0)), Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        if bio:
+            bh = len(bio) * bs * 1.6 + bpad * 1.6
+            ImageDraw.Draw(imb).rounded_rectangle([xm, y, xm + boxw, y + bh], radius=bs * .7, fill=WHITE + (250,))
+            dt = ImageDraw.Draw(imt)
+            for i, b in enumerate(bio):
+                dt.text((xm + bpad, y + bpad * .8 + bs * 1.6 * i + bs * 1.1), b, font=fx_font('W6', bs), fill=INK + (255,), anchor='ls', **FEAT)
+        L_['box'], L_['bio'] = (imb, None), (imt, None)
+        self.layers = L_
+        self.in_total = 0 if self.fx['in'] == 'cut' and self.fx.get('instant') else max(e for _, _, e in self.STEPS)
+        self.rest = self._frame(10 ** 6)
+        self.blank = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+
+    def _frame(self, f):
+        out = self.panel.copy()
+        for key, a, b in self.STEPS:
+            im, span = self.layers[key]
+            t = clamp((f - a) / max(1, b - a))
+            if t <= 0:
+                continue
+            if key == 'tag':                                # 札は左から伸びる（細い縦の線から）
+                x0, x1 = span
+                e = t * t * (3 - 2 * t)
+                x = x0 + max(6, (x1 - x0) * e)
+                im = im.crop((0, 0, int(x), self.H))
+                out.alpha_composite(im, (0, 0))
+                continue
+            if t < 1:
+                im = im.copy()
+                im.putalpha(im.getchannel('A').point(lambda v, t=t: int(v * t)))
+            out.alpha_composite(im)
+        return out
+
+    def frame(self, f):
+        if not 0 <= f < self.n:
+            return self.blank
+        return self.rest if f >= self.in_total else self._frame(f)
+
+    def still(self):
+        return self.rest
+
+    def rest_bbox(self):
+        return self.rest.getbbox()
+
+
 # ---------------------------------------------------------------- 4択パネル（2026-11-07）
 # クイズ番組風：黒い六角の板に光る縁、左右の先から画面の端まで光る線。縦の画面向けに、問題の下へ選択肢を縦に積む。
 # 1行目＝問題、2行目から＝選択肢。fx：answer（正解の記号か番号）・pick（選んだ答え＝橙）・pick_at／reveal_at（秒）・labels・edge（縁の色）
@@ -3816,7 +4036,7 @@ def catalog_xml_looks(out):
 CATALOG_DIR = Path(__import__('os').environ.get('TELOP_CATALOG_DIR') or Path(__file__).resolve().parent.parent / 'catalog')
 CATALOG_GROUPS = (('kihon', '基本'), ('glow', 'グロー系'), ('variety', 'バラエティの字幕型'), ('news', 'ニュース風'), ('kaiten', '3D 回転'),
                   ('quiz', 'クイズ'), ('parody', 'ニュース・情報番組（パロディ用）'), ('tokuban', '選挙特番の題字（年ごと）'),
-                  ('gaitou', '街頭インタビュー風'))
+                  ('gaitou', '街頭インタビュー風'), ('taidan', 'ビジネス対談風'))
 
 
 # 題字の色違い（2026-11-07 ユーザー「これも登録しておいて」）：カード 1 枚で色まで決まる（tint・metal）
@@ -3838,11 +4058,12 @@ def _catalog_entries():
     for name, (desc, m) in MOODS.items():
         group = ('glow' if name in GLOW_MOODS else 'variety' if name in VARIETY_MOODS else 'news' if name in NEWS_MOODS
                  else 'kaiten' if name in KAITEN_MOODS else 'quiz' if name in QUIZ_MOODS else 'parody' if name in PARODY_MOODS
-                 else 'tokuban' if name in KAISAN_MOODS else 'gaitou' if name in GAITOU_MOODS else 'kihon')
+                 else 'tokuban' if name in KAISAN_MOODS else 'gaitou' if name in GAITOU_MOODS else 'taidan' if name in TAIDAN_MOODS else 'kihon')
         lines, paint = _card_sample(name, m)
         fx = dict(mood=name, **({'paint': paint} if paint else {}), **(NEWS_SAMPLES[name][1] if name in NEWS_MOODS else {}),
                   **(QUIZ_SAMPLES[name][1] if name in QUIZ_MOODS else {}), **VARIETY_EXTRA.get(name, {}),
-                  **(PARODY_SAMPLES[name][1] if name in PARODY_MOODS else {}), **(GAITOU_SAMPLES[name][1] if name in GAITOU_MOODS else {}))
+                  **(PARODY_SAMPLES[name][1] if name in PARODY_MOODS else {}), **(GAITOU_SAMPLES[name][1] if name in GAITOU_MOODS else {}),
+                  **(TAIDAN_SAMPLES[name][1] if name in TAIDAN_MOODS else {}))
         out.append((name, desc, m, group, lines, fx))
     for base, tint, metal, label in KAISAN_VARIANTS:
         vid = f'{base}_{tint}' + ('_metal' if metal else '')
@@ -3864,7 +4085,7 @@ def _nhk_status(name, m):
     if (name == 'ikari' or name in KAITEN_MOODS or name in PARODY_MOODS or name in KAISAN_MOODS
             or name in ('yontaku_nhk', 'mondai_nhk')):      # 3D 回転・4択の NHK 版・パロディ用は 11-07 に候補へ（ユーザー）
         return 'use'
-    if name in VARIETY_MOODS or name in NEWS_MOODS or name in QUIZ_MOODS or name in GAITOU_MOODS:
+    if name in VARIETY_MOODS or name in NEWS_MOODS or name in QUIZ_MOODS or name in GAITOU_MOODS or name in TAIDAN_MOODS:
         return 'tbd'
     return 'ok'
 
@@ -3896,6 +4117,8 @@ def _card_sample(name, m):
         return [('スクランブル化', 'y')], None
     if name in GAITOU_SAMPLES:
         return GAITOU_SAMPLES[name][0], None
+    if name in TAIDAN_SAMPLES:
+        return TAIDAN_SAMPLES[name][0], None
     return BASIC_SAMPLES.get(name, [('受信料の', 'w'), ('使い道', m.get('color', 'y'))]), None
 
 
