@@ -634,6 +634,65 @@ def st_jouhou_name(C, key):
                            tag_fill=_PINK, tag_ink=WHITE, tag_edge=_PINK, tag_kind='tab', tag_r=0), shadow=dict(dx=0, dy=.02, blur=.02, a=.15))
 
 
+# ---- 広報の告知（パロディ用）とニュース番組の字幕（2026-11-08。受信料の手続きの告知と夕方のニュースの画面から、作りの族だけを写した。
+#      局のロゴ・番組のロゴ・QR コード・人の絵は描かない）。どれも出方は cut
+_KH_INK, _KH_GRAY, _KH_YEL, _KH_RED = (26, 26, 30), (118, 118, 124), (250, 214, 30), (230, 0, 18)
+_NW_GREEN = (0, 150, 112)
+
+
+def st_kouhou(C, key):
+    """広報の告知の字：黒い中太のゴシック（白は灰色の小さい字＝肩書き・黄は黒い字の下に黄色い線）。白い細縁（暗い背景でも読める）"""
+    T_ = _KH_GRAY if key == 'w' else _KH_RED if key == 'r' else _KH_INK
+    return dict(font='W6', track=.02, row_gap=.32, row_r=True, fill=[(0, T_), (1, T_)], layers=[dict(w=.05, color=WHITE)], uline=(key == 'y'),
+                plate=dict(kind='uline', color=_KH_YEL, pad=(.5, .3), panel=WHITE, fit_pad=True))   # 白い板（元は白い画面の上。映像の上でも読めるように）
+
+
+def st_kouhou_fuki(C, key):
+    """広報の吹き出し：角の丸い色の板（行の色・既定は赤）に白い中太の字、下の真ん中にしっぽ"""
+    P_ = {'r': _KH_RED, 'w': _KH_RED, 'k': (40, 40, 46), 'y': (236, 170, 0)}.get(key, C)
+    return dict(font='W6', fill=[(0, WHITE), (1, WHITE)],
+                plate=dict(kind='round', fill=P_, edge=P_, ew=.01, r=.12, pad=(.55, .32), tail=True))
+
+
+def st_kouhou_arc(C, key):
+    """弧に並ぶ字（広報の「よろしくお願いします」）：黒い中太のゴシックを上に膨らむ弧に"""
+    return dict(font='W6', fill=[(0, _KH_INK), (1, _KH_INK)])
+
+
+def st_news_super(C, key):
+    """ニュースの見出しの帯：横いっぱいの白い帯（上に緑の線）に黒い太字・左上に白い場所の札（tag）"""
+    T_ = {'r': (214, 36, 24)}.get(key, INK)
+    return dict(font='W8', fill=[(0, T_), (1, T_)],
+                plate=dict(kind='bar', full=True, fill=[(0, WHITE), (.7, (246, 247, 248)), (1, (226, 230, 232))], top=_NW_GREEN,
+                           top_w=.05, pad=(.4, .42), fit_pad=True, tag_fill=WHITE, tag_ink=INK, tag_edge=WHITE, tag_kind='tab', tag_r=0, tag_size=.5))
+
+
+def st_news_namae(C, key):
+    """ニュースの名前の札：白い板に黒い字（字の間を広く）"""
+    return dict(font='W7', track=.28, fill=[(0, INK), (1, INK)],
+                plate=dict(kind='bar', fill=[(0, WHITE), (1, (240, 241, 244))], alpha=.94, pad=(.5, .16)))
+
+
+def st_news_vtr(C, key):
+    """映像の右上の字幕：半透明の白い板（上に緑の線）に黒い太字 2 行・下に暗い帯の場所（tag）"""
+    T_ = {'r': (214, 36, 24)}.get(key, INK)
+    return dict(font='W8', fill=[(0, T_), (1, T_)],
+                plate=dict(kind='bar', fill=[(0, WHITE), (1, (238, 240, 242))], alpha=.9, top=_NW_GREEN, top_w=.07, pad=(.35, .18),
+                           tag_kind='under', tag_fill=(28, 30, 34), tag_ink=WHITE))
+
+
+def st_news_satsuei(C, key):
+    """撮影の札：白い板に黒い名前・左に緑の四角の撮影の印（カメラ）"""
+    return dict(font='W8', fill=[(0, INK), (1, INK)],
+                plate=dict(kind='bar', fill=[(0, WHITE), (1, (240, 241, 244))], alpha=.94, pad=(.3, .1), icon=_NW_GREEN))
+
+
+def st_news_jikoku(C, key):
+    """時刻：白い細めの字＋暗い影（左上の「6:45」）"""
+    return dict(font='W6', track=.04, fill=[(0, WHITE), (1, (236, 238, 242))], glows=[dict(color=BLACK, r=.08, a=.5)],
+                shadow=dict(dx=.02, dy=.03, blur=.02, a=.6))
+
+
 def st_doc(C, key):
     """ドキュメンタリー番組の題字（2026-11-08。大型ドキュメンタリーのタイトルの作りの族）：白い明朝＋暗いにじみ（光らせない＝白い光は読めない 11-07）。
     肩書き（上の小さい行）・副題（下の「〜…〜」）は fx の sizes（行ごとの大きさ）と fonts（行ごとの書体）で"""
@@ -792,6 +851,14 @@ STYLES = {
     'jouhou_title': ('朝の情報番組の題名（ピンクの縁の白い札）', st_jouhou_title),
     'jouhou_name': ('朝の情報番組の名前の札（ピンクのタブ＋色の縦じま）', st_jouhou_name),
     'doc': ('ドキュメンタリー番組の題字（白い明朝＋暗いにじみ）', st_doc),
+    'kouhou': ('広報の告知の字（黒い中太・白＝灰色の肩書き・黄＝下に黄色い線）', st_kouhou),
+    'kouhou_fuki': ('広報の吹き出し（赤い板に白い字・下にしっぽ）', st_kouhou_fuki),
+    'kouhou_arc': ('弧に並ぶ字（広報の「よろしくお願いします」）', st_kouhou_arc),
+    'news_super': ('ニュースの見出しの帯（白い帯＋緑の線・場所の札は tag）', st_news_super),
+    'news_namae': ('ニュースの名前の札（白い板・字の間を広く）', st_news_namae),
+    'news_vtr': ('映像の右上の字幕（白い板＋緑の線・下に場所 tag）', st_news_vtr),
+    'news_satsuei': ('撮影の札（白い板＋緑の撮影の印）', st_news_satsuei),
+    'news_jikoku': ('時刻（白い字＋暗い影）', st_news_jikoku),
     'gaitou': ('色の太明朝（色のグラデ＋白い縁＋濃い外縁＋厚み。白は黒い縁）', st_gaitou),
     'gaitou_go': ('太いゴシック（白い字＋黒い太縁＋黒いにじみ。色の字は太明朝と同じ重ね）', st_gaitou_go),
     'gaitou_sub': ('話し言葉の字幕（色の字＋白い細縁＋同じ色の光。白い字は edge の色）', st_gaitou_sub),
@@ -1432,6 +1499,14 @@ MOODS = {
     'kaisetsu': ('解説番組の見出し（行ごとの斜めの帯・星形の札は tag）', dict(style='kaisetsu', **{'in': 'cut'}, hold='none', color='w')),
     'jouhou_title': ('朝の情報番組の題名（ピンクの縁の白い札・要の語は赤）', dict(style='jouhou_title', **{'in': 'cut'}, hold='none', color='k')),
     'jouhou_name': ('朝の情報番組の名前の札（ピンクのタブ tag＝所属・色の縦じま）', dict(style='jouhou_name', **{'in': 'cut'}, hold='none', color='k')),
+    'kouhou_madoguchi': ('広報の窓口の札（右上・肩書きは灰色・黄の行に黄色い線）', dict(style='kouhou', **{'in': 'cut'}, hold='none', color='k', align='r')),
+    'kouhou_fukidashi': ('広報の吹き出し（「お手続きはこちら」）', dict(style='kouhou_fuki', **{'in': 'cut'}, hold='none', color='r')),
+    'kouhou_arc': ('弧に並ぶあいさつ（広報の「よろしくお願いします」）', dict(style='kouhou_arc', **{'in': 'cut'}, hold='none', color='k')),
+    'news_super': ('ニュースの見出しの帯（緑の線・左上の場所は tag）', dict(style='news_super', **{'in': 'cut'}, hold='none', color='k', align='l')),
+    'news_namae': ('ニュースの名前の札（白い板）', dict(style='news_namae', **{'in': 'cut'}, hold='none', color='k')),
+    'news_vtr': ('映像の右上の字幕（2行・下の場所は tag）', dict(style='news_vtr', **{'in': 'cut'}, hold='none', color='k', align='r')),
+    'news_satsuei': ('撮影の札（右下・名前）', dict(style='news_satsuei', **{'in': 'cut'}, hold='none', color='k', align='r')),
+    'news_jikoku': ('時刻（左上）', dict(style='news_jikoku', **{'in': 'cut'}, hold='none', color='w', align='l')),
     'doc_title': ('ドキュメンタリー番組の題字（白い明朝・肩書きと副題は sizes と fonts）', dict(style='doc', **{'in': 'doc_in'}, hold='grow', out='fade', color='w')),
     # 選挙特番の題字（2026-11-07）：年ごとの「衆議院解散」の題字の作り。行の色＝黄で元のまま・白で銀・ほかの色でその色の光と縁
     **{f'kaisan_{y}': (f'選挙特番の題字 {y} 年の作り（NHK の衆議院解散の題字）', dict(style=f'tokuban_{y}', **{'in': 'pop'}, hold='none', color='y'))
@@ -1476,11 +1551,11 @@ SUB_STYLES = ('jimaku', 'dekai', 'tsuyo', 'geki', 'waku', 'waku_ao', 'news_jimak
               'gaitou', 'gaitou_go', 'gaitou_sub', 'gaitou_staff', 'gaitou_obi', 'gaitou_q', 'gaitou_kado', 'tatefuda')     # バラエティの字幕型（XML だけの版でも動きなし）
 VARIETY_MOODS = ('jimaku', 'honne', 'tsumeyori', 'kyouchou', 'dokuhaku', 'narration', 'midashi', 'bara_mix', 'shuchou', 'nafuda',
                  'kuromin', 'kokuhaku', 'mascot_name', 'mascot_title', 'side_super', 'jikanwari')
-NEWS_MOODS = ('news_jimaku', 'news_obi', 'news_kyouchou', 'news_fuda')
+NEWS_MOODS = ('news_jimaku', 'news_obi', 'news_kyouchou', 'news_fuda', 'news_super', 'news_namae', 'news_vtr', 'news_satsuei', 'news_jikoku')
 KAITEN_MOODS = ('kaiten_tate', 'kaiten_yoko', 'kaiten_gin', 'kaiten_pop')
 QUIZ_MOODS = ('yontaku', 'yontaku_kin', 'mondai', 'yontaku_nhk', 'mondai_nhk')
 PARODY_MOODS = ('sokuho_flash', 'sokuho_head', 'news_head', 'news_cap', 'news_corner', 'news_basho', 'kaisetsu', 'jouhou_title', 'jouhou_name',
-                'doc_title')
+                'doc_title', 'kouhou_madoguchi', 'kouhou_fukidashi', 'kouhou_arc')
 KAISAN_MOODS = tuple(f'kaisan_{y}' for y in TOKUBAN_YEARS)
 # 見本の文言は本物のニュースと取り違えないもの（作り話のニュースを書かない）
 PARODY_SAMPLES = {
@@ -1495,6 +1570,9 @@ PARODY_SAMPLES = {
     'jouhou_name': ([('ある元NHK職員', 'k')], {'tag': '解説'}),
     'doc_title': ([('ドキュメント 公共放送', 'w'), ('受信料', 'w'), ('崩壊の足音', 'w'), ('〜公共放送は誰のものか〜', 'w')],
                   {'sizes': [.34, 1, 1, .4], 'fonts': ['W8']}),
+    'kouhou_madoguchi': ([('受信料の窓口', 'w'), ('インターネットからの', 'y'), ('お手続き', 'k')], {'sizes': [.62, 1, 1]}),
+    'kouhou_fukidashi': ([('お手続きは', 'r'), ('こちら', 'r')], {}),
+    'kouhou_arc': ([('よろしくお願いします', 'k')], {}),
 }
 QUIZ_SAMPLES = {'yontaku': ([('受信料は 月いくら？', 'w'), ('1100円', 'w'), ('2200円', 'w'), ('550円', 'w'), ('無料', 'w')], {'pick': 'C', 'answer': 'A'}),      # 地上契約・口座振替の月額（2023-10〜）
                 'yontaku_kin': ([('NHKの会長を 選ぶのは？', 'w'), ('経営委員会', 'w'), ('総理大臣', 'w'), ('国会', 'w'), ('視聴者', 'w')], {'answer': 'A'}),       # 会長は経営委員会が任命（放送法52条）
@@ -1510,6 +1588,11 @@ NEWS_SAMPLES = {
     'news_obi': ([('受信料 どう思う？', 'w')], {'paint': {'受信料': 'y'}, 'tag': '妻'}),
     'news_kyouchou': ([('値上げに反発', 'r')], {}),
     'news_fuda': ([('月1100円〜', 'w')], {'tag': '受信料'}),
+    'news_super': ([('受信料 値下げ検討', 'k')], {'tag': '東京 渋谷'}),
+    'news_namae': ([('元NHK職員', 'k')], {}),
+    'news_vtr': ([('受信料の値下げ', 'k'), ('来年度から検討', 'k')], {'tag': '東京 渋谷'}),
+    'news_satsuei': ([('元NHK職員', 'k')], {}),
+    'news_jikoku': ([('6:45', 'w')], {}),
 }
 VARIETY_SAMPLES = {
     'jimaku': ([('受信料って本当に', 'w'), ('払う必要あるの？', 'w')], {'払う必要': 'r'}),
@@ -1889,6 +1972,8 @@ class FxTelop:
             return TateFuda(item, L, n)                # 縦の札も別の描き手
         if st_ == 'jikanwari':
             return JikanWari(item, L, n)               # 時間割の帯も別の描き手
+        if st_ == 'kouhou_arc':
+            return ArcText(item, L, n)                 # 弧に並ぶ字も別の描き手
         return super().__new__(cls)
 
     def __init__(self, item, L, n, mode='chars', own_stroke=None):
@@ -1970,6 +2055,8 @@ class FxTelop:
         pl = st.get('plate') if self.mode == 'chars' else None
         if pl and pl.get('tag_kind') == 'burst' and self.fx.get('tag'):    # 星形の札の分（帯の左の外に置く＝字にかけない）
             return (pl.get('pad', (.4, .2))[0] + 1.25) * px
+        if pl and pl.get('fit_pad'):                        # 板の左右の余白も幅に数える（広報の窓口の札・ニュースの見出しの帯・2026-11-08）
+            return pl.get('pad', (.4, .2))[0] * px
         return (pl.get('pad', (.4, .2))[0] + pl.get('ew', .08)) * px if pl and pl.get('kind') == 'round' else 0
 
     def _measure(self, k):
@@ -2042,7 +2129,7 @@ class FxTelop:
                 off = max(self._outer(st_, px_) + (pl_.get('pad', (0, 0))[0] * px_ if pl_ else 0)
                           for (_, _, _, _, px_), st_ in zip(rows, self.styles)) + 4
                 wmax = max(w_ for (_, _, _, w_, _) in rows)
-                x = (sx0 + off) if al == 'l' else (sx1 - off - wmax)
+                x = (sx0 + off) if al == 'l' else (sx1 - off - (w if st.get('row_r') else wmax))   # row_r：右寄せのとき行ごとに右揃え（広報の窓口の札）
             self.rows.append(dict(px=px, base=base, x0=x, x1=x + w, st=st, delay=int(ln.get('delay') or 0)))
             pk = (paint_keys(ln['text'], ln.get('color', self.fx.get('color', 'w')), self.fx.get('paint'))
                   if self.mode == 'chars' and self.fx.get('paint') else None)
@@ -2250,8 +2337,25 @@ class FxTelop:
                     d.rectangle([x0 * S, y0 * S, x1 * S, y0 * S + tw_], fill=tuple(pl['top']) + (255,))
                 if pl.get('edge'):
                     d.rectangle([x0 * S, y0 * S, x1 * S, y1 * S], outline=tuple(pl['edge']) + (255,), width=max(1, int(em * .025 * S)))
+                if pl.get('icon'):                              # 左に色の四角の撮影の印（白いカメラ）＝撮影の札
+                    sq = y1 - y0
+                    d.rectangle([(x0 - sq) * S, y0 * S, x0 * S, y1 * S], fill=tuple(pl['icon']) + (255,))
+                    cx_, cy_, u = x0 - sq / 2, (y0 + y1) / 2, sq * .16
+                    lw_ = max(2, int(sq * .05 * S))
+                    d.rounded_rectangle([(cx_ - 2.1 * u) * S, (cy_ - 1.2 * u) * S, (cx_ + 2.1 * u) * S, (cy_ + 1.5 * u) * S],
+                                        radius=u * .4 * S, outline=WHITE + (255,), width=lw_)
+                    d.rectangle([(cx_ - 1.0 * u) * S, (cy_ - 1.8 * u) * S, (cx_ + .2 * u) * S, (cy_ - 1.2 * u) * S], fill=WHITE + (255,))
+                    d.ellipse([(cx_ - .85 * u) * S, (cy_ - .6 * u) * S, (cx_ + .85 * u) * S, (cy_ + 1.1 * u) * S], outline=WHITE + (255,), width=lw_)
             elif pl['kind'] == 'none':                          # none：台座なし（札 tag だけを出すため。スタッフの問い）
                 pass
+            elif pl['kind'] == 'uline':                         # uline：uline の行の字の下に色の線（広報の窓口の札・2026-11-08）
+                if pl.get('panel'):                             # 後ろに白い角丸の板
+                    d.rounded_rectangle([x0 * S, y0 * S, x1 * S, y1 * S], radius=em * .12 * S, fill=tuple(pl['panel']) + (245,))
+                for r in self.rows:
+                    if r['st'].get('uline'):
+                        yb = r['base'] + .2 * r['px'] - self.ry0
+                        d.rectangle([(r['x0'] - self.rx0) * S, yb * S, (r['x1'] - self.rx0) * S, (yb + r['px'] * .1) * S],
+                                    fill=tuple(pl.get('color', _KH_YEL)) + (255,))
             elif pl['kind'] == 'divider':                       # divider：行と行の間に色の区切りの帯（右下の要点・2026-11-08）
                 cols = [tuple(c_) for c_ in (pl.get('colors') or SIDE_BAND)]
                 for ra, rb in zip(self.rows, self.rows[1:]):
@@ -2290,6 +2394,10 @@ class FxTelop:
                 d.rounded_rectangle([x0 * S, y0 * S, x1 * S, y1 * S], radius=rr * S, fill=tuple(pl.get('edge', (250, 200, 30))) + (255,))
                 d.rounded_rectangle([(x0 + ew) * S, (y0 + ew) * S, (x1 - ew) * S, (y1 - ew) * S], radius=max(0, rr - ew * .6) * S,
                                     fill=tuple(pl.get('fill', WHITE)) + (255,))
+                if pl.get('tail'):                              # 下の真ん中のしっぽ（広報の吹き出し）
+                    cx_, tw_ = (x0 + x1) / 2, em * .3
+                    d.polygon([((cx_ - tw_) * S, (y1 - 2) * S), ((cx_ + tw_) * S, (y1 - 2) * S), (cx_ * S, (y1 + em * .3) * S)],
+                              fill=tuple(pl.get('fill', WHITE)) + (255,))
             else:                                               # burst：ギザギザ
                 cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
                 rx, ry = (x1 - x0) / 2, (y1 - y0) / 2
@@ -2351,6 +2459,12 @@ class FxTelop:
                 th = em * .9
                 bx0, by1 = x0 + (y1 - y0) * .32 + em * .2, y0 + th * .18      # 上の縁にまたがる（字にはかけない）
                 box = [bx0, by1 - th, bx0 + tw + em * 1.0, by1]
+            elif pl.get('tag_kind') == 'under':               # 下の暗い帯：板の下にくっつけて、字は右寄せ（映像の右上の字幕の場所）
+                uh = em * .62
+                d.rectangle([x0 * S, y1 * S, x1 * S, (y1 + uh) * S], fill=tuple(pl['tag_fill']) + (int(255 * .82),))
+                fu = fx_font('W8', em * .44 * S)
+                d.text(((x1 - em * .3) * S, (y1 + uh / 2) * S), tag, font=fu, fill=tuple(pl['tag_ink']) + (255,), anchor='rm', **FEAT)
+                tag = None
             elif pl.get('tag_kind') == 'tab':                 # タブ：板の上の左に、板にくっつけて
                 th = em * (.92 if 'tag_size' not in pl else pl['tag_size'] * 1.3)
                 bx0, by1 = x0, y0 + pl.get('ew', .04) * em
@@ -3186,6 +3300,56 @@ class JikanWari:
         img = img.resize((int(img.width / S), int(img.height / S)), Image.LANCZOS)
         self.img = Image.new('RGBA', (self.W, self.H), (0, 0, 0, 0))
         self.img.alpha_composite(img, (int(ox), int(oy)))
+        self.blank = Image.new('RGBA', (self.W, self.H), (0, 0, 0, 0))
+
+    def frame(self, f):
+        return self.img if 0 <= f < self.n else self.blank
+
+    def still(self):
+        return self.img
+
+    def rest_bbox(self):
+        return self.img.getbbox()
+
+
+# ---------------------------------------------------------------- 弧に並ぶ字（2026-11-08・広報の「よろしくお願いします」）
+# 1 行目の字を、上に膨らむ弧に並べる（字は弧に沿って傾く）。縦はテロップの高さ（y）を弧のまとまりの真ん中に。fx の arc＝弧の開き（度・既定 46）
+class ArcText:
+    def __init__(self, item, L, n):
+        self.it, self.L, self.n = item, L, max(1, n)
+        self.W, self.H = L['W'], L['H']
+        self.fx = resolve_fx(item.get('fx') or {})
+        self.in_total = 0
+        ln = next((l for l in item['lines'] if l['text'].strip()), item['lines'][0])
+        text = ln['text'].strip()
+        key = ln.get('color', self.fx.get('color', 'k'))
+        ink = _KH_INK if key == 'k' else WHITE if key == 'w' else BASE.get(key, _KH_INK)
+        edge = WHITE if key != 'w' else INK
+        sx0, sy0, sx1, sy1 = safe_rect(L)
+        cs = ln['px'] * .62
+        span = math.radians(float(self.fx.get('arc', 46)))
+        f = fx_font('W6', cs)
+        adv = [f.getlength(c, **FEAT) * 1.12 for c in text]
+        total = sum(adv)
+        R = total / span
+        if 2 * R * math.sin(span / 2) > (sx1 - sx0) * .96:     # 横に収まらないなら字を小さく
+            k = (sx1 - sx0) * .96 / (2 * R * math.sin(span / 2))
+            cs, R, adv, total = cs * k, R * k, [a * k for a in adv], total * k
+            f = fx_font('W6', cs)
+        cy_text = sum(l['baseline'] - .38 * l['px'] for l in item['lines'][:1])
+        sag = R * (1 - math.cos(span / 2))
+        ccx, ccy = self.W / 2, cy_text - sag / 2 + R           # 円の中心（弧の頂上が cy_text - sag/2）
+        self.img = Image.new('RGBA', (self.W, self.H), (0, 0, 0, 0))
+        a = -span / 2
+        for c, w in zip(text, adv):
+            mid = a + (w / total) * span / 2
+            x, y = ccx + R * math.sin(mid), ccy - R * math.cos(mid)
+            g = Image.new('RGBA', (int(cs * 2), int(cs * 2)), (0, 0, 0, 0))
+            ImageDraw.Draw(g).text((cs, cs), c, font=f, fill=ink + (255,), anchor='mm', stroke_width=max(2, int(cs * .13)),
+                                   stroke_fill=edge + (255,), **FEAT)
+            g = g.rotate(-math.degrees(mid), resample=Image.BICUBIC)
+            self.img.alpha_composite(g, (max(0, int(x - g.width / 2)), max(0, int(y - g.height / 2))))
+            a += (w / total) * span
         self.blank = Image.new('RGBA', (self.W, self.H), (0, 0, 0, 0))
 
     def frame(self, f):
