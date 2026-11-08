@@ -848,6 +848,80 @@ def st_amecomi(C, key):
                 extrude=dict(dx=.05, dy=.06, color=(10, 10, 12)), shadow=dict(dx=.06, dy=.08, blur=.02, a=.4))
 
 
+# ---- 怖い字の崩し（2026-11-09。素材集の「震え感・恐怖感・トゲトゲ感」の見本から）。型の rough＝字のふちの崩し方
+#      furue＝横の細い帯ごとに波打たせる（震え）・kyoufu＝縦横に細かくずらす（ギザギザ）・toge＝ふちからトゲを生やす
+_SPIKES = {}
+
+
+def _rough(m, kind, amt, seed, px, sw=0, base=None):
+    """字のマスク m を崩す。同じ seed なら縁の段（sw ちがい）も同じ崩し方になる"""
+    w, h = m.size
+    rnd = random.Random(seed)
+    a = px * amt
+    if kind == 'kyoufu':                                     # ギザギザ：少しぼかした字に、なめらかな乱れ（種で決まる）を足して切り直す＝擦れたふち
+        cell = max(2, int(px * .028))
+        gw, gh = w // cell + 2, h // cell + 2
+        N = Image.new('L', (gw, gh))
+        N.putdata([int(128 + rnd.uniform(-1, 1) * 255 * amt * 6) for _ in range(gw * gh)])
+        N = N.resize((gw * cell, gh * cell), Image.BILINEAR).crop((0, 0, w, h))
+        mb = m.filter(ImageFilter.GaussianBlur(max(1.0, px * .016)))
+        m = ImageChops.add(mb, N, 1.0, -128).point(lambda v: 255 if v > 128 else 0).filter(ImageFilter.GaussianBlur(.7))
+        return m
+    if kind == 'furue':
+        step = max(2, int(px * .03))
+        out = Image.new('L', (w, h), 0)
+        ph, y = rnd.uniform(0, 6.3), 0
+        while y < h:
+            dx = a * math.sin(ph + y / (px * .09)) + rnd.uniform(-a * .4, a * .4)
+            out.paste(m.crop((0, y, w, min(h, y + step))), (int(round(dx)), y))
+            y += step
+        return out
+    if kind == 'toge':                                       # ふちからトゲ（向きはふちの外向き・下向きが多め）
+        key = (seed, w, h)
+        if key not in _SPIKES:
+            b0 = base if base is not None else m
+            ring = ImageChops.subtract(b0.filter(ImageFilter.MaxFilter(3)), b0)
+            bl = b0.filter(ImageFilter.GaussianBlur(max(1.0, px * .05)))
+            data = ring.load()
+            B = bl.load()
+            pts = [(x, y) for y in range(2, h - 2, 2) for x in range(2, w - 2, 2) if data[x, y] > 120]
+            rnd.shuffle(pts)
+            spikes, gap = [], px * .14
+            for (x, y) in pts:
+                if any((x - sx) ** 2 + (y - sy) ** 2 < gap * gap for sx, sy, _, _ in spikes):
+                    continue
+                gx, gy = B[min(w - 1, x + 2), y] - B[max(0, x - 2), y], B[x, min(h - 1, y + 2)] - B[x, max(0, y - 2)]
+                n = math.hypot(gx, gy) or 1.0
+                nx, ny = -gx / n, -gy / n
+                if ny < -.4 and rnd.random() < .6:            # 上向きのトゲは減らす（垂れるように）
+                    continue
+                spikes.append((x, y, nx, ny))
+                if len(spikes) > 60:
+                    break
+            _SPIKES[key] = [(x, y, nx, ny, px * rnd.uniform(.06, .17) * amt / .05) for x, y, nx, ny in spikes]
+        m = m.copy()
+        d = ImageDraw.Draw(m)
+        for x, y, nx, ny, L in _SPIKES[key]:
+            bw = px * .028 + sw * .9
+            tip = (x + nx * (L + sw), y + ny * (L + sw))
+            d.polygon([(x - ny * bw - nx * bw, y + nx * bw - ny * bw), (x + ny * bw - nx * bw, y - nx * bw - ny * bw), tip], fill=255)
+        return m
+    return m
+
+
+def st_kowaji(C, key):
+    """怖い字：血の赤の太い明朝＋黒い細縁＋黒いにじみ（ふちの崩しは気分の rough）"""
+    F = {'r': [(0, (236, 20, 20)), (1, (180, 0, 0))], 'w': [(0, WHITE), (1, (220, 220, 226))]}.get(key) or [(0, lighten(C, .1)), (1, darken(C, .2))]
+    return dict(font='mincho', bold=.03, layers=[dict(w=.06, color=(14, 0, 0))], fill=F,
+                glows=[dict(color=BLACK, r=.14, a=.8, k=2.0)])
+
+
+def st_chi_obi(C, key):
+    """血の帯：したたる赤い帯（でこぼこのふち＋下に垂れるしずく）に黒い太字（白の行は白い字）"""
+    T_ = WHITE if key == 'w' else INK
+    return dict(font='W8', fill=[(0, T_), (1, T_)], plate=dict(kind='drip', fill=(214, 0, 8), pad=(.6, .32)))
+
+
 def st_doc(C, key):
     """ドキュメンタリー番組の題字（2026-11-08。大型ドキュメンタリーのタイトルの作りの族）：白い明朝＋暗いにじみ（光らせない＝白い光は読めない 11-07）。
     肩書き（上の小さい行）・副題（下の「〜…〜」）は fx の sizes（行ごとの大きさ）と fonts（行ごとの書体）で"""
@@ -1022,6 +1096,8 @@ STYLES = {
     'box_rittai': ('色の板の立体（色の板に白い字＋黒い厚み）', st_box_rittai),
     'hako_moji': ('1字ずつの色の箱（白い字・黒い厚み）', st_hako_moji),
     'amecomi': ('アメコミ風（黄→橙→ピンクの斜めの字＋黒白黒の縁）', st_amecomi),
+    'kowaji': ('怖い字（血の赤の太い明朝・ふちの崩しは rough）', st_kowaji),
+    'chi_obi': ('血の帯（したたる赤い帯に黒い字）', st_chi_obi),
     'touron_jimaku': ('討論の字幕（半透明の暗い箱に白い太字）', st_touron_jimaku),
     'touron_midashi': ('右上の話題の見出し（白い帯に黒い明朝・茶色の線）', st_touron_midashi),
     'touron_jinbutsu': ('人物紹介の札（茶色の板・名前のタブ）', st_touron_jinbutsu),
@@ -1708,6 +1784,10 @@ MOODS = {
     'box_rittai': ('色の板の立体（行の色で板の色・白い字）', dict(style='box_rittai', **{'in': 'cut'}, hold='none', color='g')),
     'hako_moji': ('1字ずつの色の箱（行の色・paint で箱の色）', dict(style='hako_moji', **{'in': 'cut'}, hold='none', color='k')),
     'amecomi': ('アメコミ風の題字（黄→橙→ピンク・斜め）', dict(style='amecomi', **{'in': 'pop'}, hold='none', color='y', big=True)),
+    'furue': ('震え感（ふちが波打つ血の赤の明朝）', dict(style='kowaji', **{'in': 'cut'}, hold='none', color='r', rough='furue', big=True)),
+    'kyoufu': ('恐怖感（ふちがギザギザの血の赤の明朝）', dict(style='kowaji', **{'in': 'cut'}, hold='none', color='r', rough='kyoufu', big=True)),
+    'togetoge': ('トゲトゲ感（ふちからトゲが生えた血の赤の明朝）', dict(style='kowaji', **{'in': 'cut'}, hold='none', color='r', rough='toge', big=True)),
+    'chi_obi': ('血の帯（したたる赤い帯に黒い字）', dict(style='chi_obi', **{'in': 'cut'}, hold='none', color='k')),
     # 討論番組風（2026-11-09）：どれも cut
     'touron_katagaki': ('冒頭の肩書きの札（赤＝前の肩書き・白＝赤い板・黄＝名前・右寄せ）',
                         dict(style='touron_kata', **{'in': 'cut'}, hold='none', color='w', align='r')),
@@ -1887,7 +1967,8 @@ def catalog_kaisan(out):
     return _grid_video(cells, Path(out) / '見本_11_選挙特番の題字.mp4', '選挙特番の題字（年ごと・2026-11-07）', sec=2.6)
 
 
-SOZAI_MOODS = ('rittai_aka', 'rittai_metal', 'pop_camp', 'kansha', 'natsu', 'retro_pop', 'aka_gin', 'box_rittai', 'hako_moji', 'amecomi')
+SOZAI_MOODS = ('rittai_aka', 'rittai_metal', 'pop_camp', 'kansha', 'natsu', 'retro_pop', 'aka_gin', 'box_rittai', 'hako_moji', 'amecomi',
+               'furue', 'kyoufu', 'togetoge', 'chi_obi')
 SOZAI_SAMPLES = {
     'rittai_aka': ([('受信料', 'r'), ('値下げ!', 'r')], {}),
     'rittai_metal': ([('受信料', 'y'), ('値下げ!?', 'w')], {}),
@@ -1899,6 +1980,10 @@ SOZAI_SAMPLES = {
     'box_rittai': ([('受信料の使い道', 'g')], {}),
     'hako_moji': ([('受信料のなぞ', 'k')], {'paint': {'の': 'r'}}),
     'amecomi': ([('受信料', 'y'), ('ゼロ円!?', 'y')], {}),
+    'furue': ([('集金人が', 'r'), ('また来た', 'r')], {}),
+    'kyoufu': ([('受信料の', 'r'), ('督促状', 'r')], {}),
+    'togetoge': ([('割増金を', 'r'), ('請求', 'r')], {}),
+    'chi_obi': ([('受信料の取り立てが', 'k'), ('始まった', 'k')], {}),
 }
 TOURON_MOODS = ('touron_katagaki', 'touron_jimaku', 'touron_midashi', 'touron_jinbutsu')
 TOURON_SAMPLES = {
@@ -2025,6 +2110,8 @@ def resolve_fx(fx):
     fo_ = fx.get('fonts')
     if fo_ is not None and not (isinstance(fo_, (list, tuple)) and all(v is None or isinstance(v, str) for v in fo_)):
         raise SystemExit('telop_fx: fonts は行ごとの書体の並び（例 ["W8"]・省いた行は型の書体。W9・W8・W7・W6・mincho・maru）')
+    if fx.get('rough') not in (None, 'furue', 'kyoufu', 'toge'):
+        raise SystemExit('telop_fx: rough は furue（震え）・kyoufu（ギザギザ）・toge（トゲ）')
     tm_ = fx.get('times')
     if tm_ is not None and not (isinstance(tm_, (list, tuple)) and all(isinstance(v, str) for v in tm_)):
         raise SystemExit('telop_fx: times は時刻の字の並び（例 ["9時", "12時", "20時"]・時間割の区切り）')
@@ -2443,6 +2530,14 @@ class FxTelop:
             cd = st.get('cond', 1.0)
 
             def mask(sw):
+                m = mask_raw(sw)
+                rg = self.fx.get('rough') if self.mode == 'chars' else None
+                if rg:                                       # 字のふちの崩し（震え・ギザギザ・トゲ・2026-11-09）
+                    am = float(self.fx.get('rough_amt', {'furue': .045, 'kyoufu': .03, 'toge': .05}[rg]))
+                    m = _rough(m, rg, am, self.seed * 131 + u.idx, u.lpx, sw, base=mask_raw(0) if rg == 'toge' else None)
+                return m
+
+            def mask_raw(sw):
                 if cd != 1.0:                            # 長体：詰めた字を描いてから太らせる（縁の太さが縦横で同じになる）
                     m = Image.new('L', (int(math.ceil(w / cd)) + 2, h), 0)
                     ImageDraw.Draw(m).text((ox / cd, oy), u.text, font=f, fill=255, anchor='ls', **FEAT)
@@ -2628,6 +2723,23 @@ class FxTelop:
                     d.ellipse([(cx_ - .85 * u) * S, (cy_ - .6 * u) * S, (cx_ + .85 * u) * S, (cy_ + 1.1 * u) * S], outline=WHITE + (255,), width=lw_)
             elif pl['kind'] == 'none':                          # none：台座なし（札 tag だけを出すため。スタッフの問い）
                 pass
+            elif pl['kind'] == 'drip':                          # drip：したたる帯（でこぼこのふち＋下に垂れるしずく・2026-11-09）
+                col = tuple(pl.get('fill', (214, 0, 8))) + (255,)
+                rnd = random.Random(self.seed)
+                d.rounded_rectangle([x0 * S, y0 * S, x1 * S, y1 * S], radius=em * .3 * S, fill=col)
+                for yy, up in ((y0, True), (y1, False)):           # 上下のふちのでこぼこ
+                    xx = x0 + em * .2
+                    while xx < x1 - em * .2:
+                        r_ = em * rnd.uniform(.12, .26)
+                        cy_ = yy + (r_ * .25 if up else -r_ * .25)
+                        d.ellipse([(xx - r_) * S, (cy_ - r_) * S, (xx + r_) * S, (cy_ + r_) * S], fill=col)
+                        xx += r_ * 1.4
+                n_ = max(3, int((x1 - x0) / (em * 1.0)))
+                for k_ in range(n_):                               # 下に垂れるしずく
+                    xx = x0 + em * .4 + (x1 - x0 - em * .8) * (k_ + rnd.uniform(.15, .85)) / n_
+                    wd, L = em * rnd.uniform(.1, .2), em * rnd.uniform(.4, 1.3)
+                    d.rounded_rectangle([(xx - wd / 2) * S, (y1 - em * .1) * S, (xx + wd / 2) * S, (y1 + L) * S], radius=wd / 2 * S, fill=col)
+                    d.ellipse([(xx - wd * .85) * S, (y1 + L - wd * .9) * S, (xx + wd * .85) * S, (y1 + L + wd * .8) * S], fill=col)
             elif pl['kind'] == 'hband':                         # hband：横のグラデーションの帯（対談の字幕・2026-11-08）
                 ca, cb = pl.get('colors', (_TD_PURPLE, _TD_BLUE))
                 gw, gh = max(1, int((x1 - x0) * S)), max(1, int((y1 - y0) * S))

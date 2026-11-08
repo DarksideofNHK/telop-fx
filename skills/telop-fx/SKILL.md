@@ -1,6 +1,6 @@
 ---
 name: telop-fx
-description: 動画にテレビのバラエティ・ニュース風の「決めテロップ」を入れる。126 種の見た目（多重の縁・グラデーション・金属・ネオン・爆発の台座・3D 回転・4択クイズのパネル・画面の隅の札・一日の時間割の帯・ニュースの帯・街頭インタビュー風の字幕・選挙特番風の題字ほか）から気分の名前で選び、文字ごと焼き込んだ動画（mp4）か、編集ソフトに重ねる透明つきの動画（ProRes 4444 .mov）・止め絵（PNG）を作る。使用場面 (1) この動画の○秒に「…」をテロップで入れて、(2) 派手なテロップ・決めテロップ・テロップの装飾を作りたい、(3) テロップの見本・カタログを見たい・選びたい、(4) 透明のテロップ素材を Premiere・Final Cut・DaVinci に重ねたい。トリガー "テロップを入れて", "テロップを焼き込んで", "決めテロップ", "派手なテロップ", "テロップの見本", "テロップカタログ", "telop", "/telop-fx"
+description: 動画にテレビのバラエティ・ニュース風の「決めテロップ」を入れる。130 種の見た目（多重の縁・グラデーション・金属・ネオン・爆発の台座・3D 回転・4択クイズのパネル・画面の隅の札・一日の時間割の帯・ニュースの帯・街頭インタビュー風の字幕・選挙特番風の題字ほか）から気分の名前で選び、文字ごと焼き込んだ動画（mp4）か、編集ソフトに重ねる透明つきの動画（ProRes 4444 .mov）・止め絵（PNG）を作る。使用場面 (1) この動画の○秒に「…」をテロップで入れて、(2) 派手なテロップ・決めテロップ・テロップの装飾を作りたい、(3) テロップの見本・カタログを見たい・選びたい、(4) 透明のテロップ素材を Premiere・Final Cut・DaVinci に重ねたい。トリガー "テロップを入れて", "テロップを焼き込んで", "決めテロップ", "派手なテロップ", "テロップの見本", "テロップカタログ", "telop", "/telop-fx"
 ---
 
 # telop-fx：動画に決めテロップを入れる
@@ -11,7 +11,7 @@ description: 動画にテレビのバラエティ・ニュース風の「決め�
 
 - **動画に焼き込む**：動画と「何秒から何秒に、どの文字を、どの気分で」を並べた JSON から、テロップ入りの mp4 を作る（音はそのまま）
 - **素材だけ作る**：1 本のテロップを、透明つきの動画（.mov・ProRes 4444）か止め絵（.png）にする。編集ソフトのタイムラインに重ねて使う
-- **見本を作り直す**：126 枚のカード（見本の動画・止め絵）と一覧ページ
+- **見本を作り直す**：130 枚のカード（見本の動画・止め絵）と一覧ページ
 
 縦（1080×1920）と横（1920×1080）のどちらにも使える。動画の向きで自動で選ぶ。
 
@@ -73,6 +73,7 @@ python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py render --text スクラン
 | ビジネス対談風 | `taidan_obi`（紫→青の帯が左から伸びる）・`taidan_2dan`（2 行目は `"v"` で白い帯に紫→青の字）・`taidan_kuro`・`taidan_midashi`（左上の話題の札）・`taidan_namae`・`taidan_shashin`・`taidan_profile`（1 行目＝肩書き・2 行目＝名前・3 行目から紹介文・`tag`＝札） |
 | 討論番組風 | `touron_katagaki`（冒頭の肩書きの札。行の色 r＝赤い明朝・w＝赤い板・y＝黄色い名前）・`touron_jimaku`（暗い箱の字幕）・`touron_midashi`（右上の見出し）・`touron_jinbutsu`（人物紹介・`tag`＝名前） |
 | ポップ・立体の題字 | `rittai_aka`・`rittai_metal`（y＝金・w＝銀）・`aka_gin`（赤と銀の斜め）・`pop_camp`・`kansha`（水玉）・`natsu`（しま模様）・`retro_pop`・`amecomi`・`box_rittai`（色の板）・`hako_moji`（1字ずつの箱） |
+| 怖い字 | `furue`（震え感）・`kyoufu`（恐怖感＝擦れたふち）・`togetoge`（トゲ）・`chi_obi`（血のしたたる帯）。`"rough": "furue"` などでほかの型にも崩しを付けられる |
 | 一日の時間割の帯 | `jikanwari`（行＝区間 `[字, 色]`、`"times": ["9時", "12時", ...]`＝区切りの時刻、`"widths"`＝幅の比） |
 | ドキュメンタリー番組の題字 | `doc_title`（`"sizes": [0.34, 1, 1, 0.4]`・`"fonts": ["W8"]` で、上の肩書きと下の「〜…〜」の副題を小さく。`y` は画面の中ほど＝縦 960・横 540） |
 
@@ -93,6 +94,6 @@ python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py render --text スクラン
 ## カタログを作り直す
 
 ```bash
-python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py cards            # 126 枚の見本（catalog/。TELOP_CATALOG_DIR で場所を替えられる）
+python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py cards            # 130 枚の見本（catalog/。TELOP_CATALOG_DIR で場所を替えられる）
 python3 ~/.claude/skills/telop-fx/scripts/telop_fx.py list             # 型・動き・気分の一覧
 ```
