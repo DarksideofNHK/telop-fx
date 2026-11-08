@@ -415,6 +415,56 @@ def st_nafuda(C, key):
                 plate=dict(kind='hexpill', fill=[(0, lighten(P, .2)), (.5, P), (1, darken(P, .2))], edge=(255, 226, 120), pad=(.5, .16)),
                 shadow=dict(dx=.015, dy=.03, blur=.02, a=.3))
 
+# ---- バラエティ風 その3（2026-11-08。トーク番組の告白の一言・隅の札（マスコット）・右下の要点・一日の時間割から、作りの族だけを写した。
+#      番組名・ロゴ・出演者の名前・着物の柄の帯は使わない（柄は無地の色の区切りに替えた）。どれも出方は cut
+def st_kokuhaku(C, key):
+    """告白の一言：黒＝極太の明朝の黒い字＋白い太縁＋暗いにじみ／黄・白ほか＝太いゴシックのグラデ＋黒い縁（ひらがなは小さく）／
+    紫・青・水色・ピンク＝明朝の白から色のグラデ＋白い縁＋濃い色の外縁（2 行目を大きくするのは sizes）"""
+    sh = dict(dx=.025, dy=.045, blur=.035, a=.55)
+    sp = dict(track=.04, row_gap=.18)          # 太い縁が隣の字・下の行にかぶらないように（11-07「重なってるのがダメ」）
+    if key == 'k':
+        return dict(font='mincho', bold=.012, kana=.9, layers=[dict(w=.1, color=(20, 20, 24)), dict(w=.068, color=WHITE)],
+                    fill=[(0, (44, 44, 50)), (.55, (14, 14, 18)), (1, (60, 60, 66))],
+                    glows=[dict(color=BLACK, r=.16, a=.55)], shadow=sh, **sp)
+    if key in ('v', 'b', 'c', 'p'):
+        C = {'v': (128, 92, 214), 'p': (222, 70, 150)}.get(key, C)
+        return dict(font='mincho', bold=.01, kana=1.0, layers=[dict(w=.11, color=darken(C, .55)), dict(w=.065, color=WHITE)],
+                    fill=[(0, (252, 250, 255)), (.3, lighten(C, .55)), (1, darken(C, .05))], glows=[dict(color=darken(C, .6), r=.1, a=.5)],
+                    shadow=sh, **sp)
+    F = ([(0, WHITE), (.6, (236, 236, 240)), (1, (196, 198, 206))] if key == 'w' else
+         [(0, (255, 250, 150)), (.55, (255, 228, 40)), (1, (240, 196, 0))] if key == 'y' else
+         [(0, lighten(C, .35)), (.55, C), (1, darken(C, .15))])
+    return dict(font='W9', kana=.78, layers=[dict(w=.085, color=(26, 20, 16))], fill=F,
+                glows=[dict(color=BLACK, r=.1, a=.55)], shadow=sh, **sp)
+
+
+def st_mascot(C, key):
+    """隅の札（マスコット）・名前：白い太ゴシック＋細い黒い縁＋暗いにじみ（左上の「今夜のゲスト／名前」。肩書きは sizes と fonts で小さく）"""
+    F = [(0, WHITE), (1, (226, 228, 234))] if key in ('w', 'k') else soft_fill(C)
+    return dict(font='W9', track=.03, layers=[dict(w=.045, color=(16, 16, 20))], fill=F,
+                glows=[dict(color=BLACK, r=.14, a=.6)], shadow=dict(dx=.02, dy=.04, blur=.04, a=.6))
+
+
+def st_mascot_kin(C, key):
+    """隅の札（マスコット）・題名：金のグラデの太ゴシック＋濃い茶の細縁＋暗いにじみ（右上のコーナー名。黄＝金・ほかの色はその色）"""
+    F = ([(0, (255, 246, 170)), (.45, (250, 214, 80)), (.55, (240, 186, 40)), (1, (196, 136, 16))] if key in ('y', 'w', 'o')
+         else soft_fill(C))
+    return dict(font='W9', track=.03, layers=[dict(w=.05, color=(70, 44, 6) if key in ('y', 'w', 'o') else darken(C, .6))], fill=F,
+                glows=[dict(color=BLACK, r=.14, a=.6)], shadow=dict(dx=.02, dy=.04, blur=.04, a=.6))
+
+
+SIDE_BAND = [(214, 168, 40), (200, 50, 46), (40, 120, 80), (60, 50, 140), (214, 168, 40)]    # 右下の要点の間の帯（無地の色の区切り）
+
+
+def st_side_super(C, key):
+    """右下の要点（サイドスーパー）：白い太ゴシック＋濃い赤の縁＋赤いにじみ、行と行の間に色の区切りの帯（align で寄せる）"""
+    F = [(0, WHITE), (.6, (238, 238, 242)), (1, (200, 202, 210))] if key in ('w', 'k') else soft_fill(C)
+    E = (150, 16, 24) if key in ('w', 'k', 'r') else darken(C, .5)
+    return dict(font='W9', kana=.82, track=.02, row_gap=.36, layers=[dict(w=.06, color=darken(E, .5))], fill=F,
+                glows=[dict(color=E, r=.2, a=.9)], shadow=dict(dx=.015, dy=.03, blur=.03, a=.5),
+                plate=dict(kind='divider', colors=SIDE_BAND, pad=(0, 0)))
+
+
 # ---- 街頭インタビュー風（2026-11-07。深夜バラエティの街頭インタビューの切り抜きから、縁の重ね方と色の族だけを写した。
 #      番組名・ロゴ・出演者の顔のアイコン・桜の額は使わない）。どれも出方は cut（30 コマ/秒で見て動きなし）。
 #      元の作り：言い切りの一言＝太い明朝の色のグラデ＋白い縁＋濃い外縁＋厚み、白い一言＝太いゴシック＋黒い縁、
@@ -750,6 +800,11 @@ STYLES = {
     'gaitou_q': ('問いの板（白い角丸の板に黒い字・要の語は赤）', st_gaitou_q),
     'gaitou_kado': ('1字ずつの箱の題名（黒い帯の上に白い箱・要の語は黄緑の箱）', st_gaitou_kado),
     'tatefuda': ('縦の札（色の板に白い縦書き・写真の横に「実際の○○」）', lambda C, key: st_tatefuda(C, key)),
+    'kokuhaku': ('告白の一言（黒＝極太明朝＋白い縁／黄・白＝太いゴシック／紫ほか＝白から色の明朝）', st_kokuhaku),
+    'mascot': ('隅の札・名前（白い太ゴシック＋暗いにじみ・左上）', st_mascot),
+    'mascot_kin': ('隅の札・題名（金のグラデの太ゴシック・右上）', st_mascot_kin),
+    'side_super': ('右下の要点（白い太ゴシック＋赤いにじみ・間に色の帯）', st_side_super),
+    'jikanwari': ('一日の時間割の帯（行＝区間・色の板に白い字・上に時刻）', lambda C, key: st_jikanwari(C, key)),
     'tokuban_2005': ('選挙特番の題字 2005（銀のゴシック＋立体の影）', st_tokuban_2005),
     'tokuban_2009': ('選挙特番の題字 2009（金の太いゴシック＋黒い厚み）', st_tokuban_2009),
     'tokuban_2012': ('選挙特番の題字 2012（明るい金・字の間を広く）', st_tokuban_2012),
@@ -759,7 +814,7 @@ STYLES = {
     'tokuban_2024': ('選挙特番の題字 2024（白から金の細めの明朝＋金の厚み）', st_tokuban_2024),
     'tokuban_2026': ('選挙特番の題字 2026（金の明朝＋赤い縁＋赤い光）', st_tokuban_2026),
 }
-MULTI_LINE_FX = ('yontaku',)       # 3 行を超えてよい決めテロップ（build_premiere が控えの文字クリップを 3 行までにする）
+MULTI_LINE_FX = ('yontaku', 'jikanwari')       # 3 行を超えてよい決めテロップ（build_premiere が控えの文字クリップを 3 行までにする）
 
 
 def style_of(name, key, over=None):
@@ -1346,6 +1401,14 @@ MOODS = {
     'bara_mix': ('大小と色を混ぜた字幕（語ごとに paint と size_words）', dict(style='bara', **{'in': 'cut'}, hold='none', color='k')),
     'shuchou': ('主張の札（紫の名前のタブ tag＋緑に光る六角の板・2行目は黄）', dict(style='shuchou', **{'in': 'pop'}, hold='none', color='w')),
     'nafuda': ('出演者の名札（両端のとがった色の札・前の小さい語は size_words）', dict(style='nafuda', **{'in': 'cut'}, hold='none', color='v')),
+    # バラエティ風 その3（2026-11-08）：告白の一言・隅の札（マスコット）・右下の要点・時間割。どれも cut
+    'kuromin': ('黒い極太明朝の一言（白い太縁・画面いっぱい）', dict(style='kokuhaku', **{'in': 'cut'}, hold='none', color='k', big=True)),
+    'kokuhaku': ('告白の2段（黄の太字＋紫の明朝・語の色は paint・2行目の大きさは sizes）',
+                 dict(style='kokuhaku', **{'in': 'cut'}, hold='none', color='y', big=True)),
+    'mascot_name': ('隅の札・名前（左上・小さい肩書きは sizes と fonts）', dict(style='mascot', **{'in': 'cut'}, hold='none', color='w', align='l')),
+    'mascot_title': ('隅の札・題名（右上・金の太ゴシック）', dict(style='mascot_kin', **{'in': 'cut'}, hold='none', color='y', align='r')),
+    'side_super': ('右下の要点（2行・間に色の帯・右寄せ）', dict(style='side_super', **{'in': 'cut'}, hold='none', color='w', align='r')),
+    'jikanwari': ('一日の時間割（行＝区間・時刻は times・幅は widths）', dict(style='jikanwari', **{'in': 'cut'}, hold='none', color='w')),
     # 街頭インタビュー風（2026-11-07）。どれも cut。要の語の色は paint、白い字幕の縁の色は edge、スタッフの札は tag
     'gaitou_aka': ('言い切りの一言（色の太明朝・赤）', dict(style='gaitou', **{'in': 'cut'}, hold='none', color='r', big=True)),
     'gaitou_ao': ('しくじった一言（色の太明朝・青）', dict(style='gaitou', **{'in': 'cut'}, hold='none', color='b', big=True)),
@@ -1411,7 +1474,8 @@ GLOW_SAMPLES = {
 
 SUB_STYLES = ('jimaku', 'dekai', 'tsuyo', 'geki', 'waku', 'waku_ao', 'news_jimaku', 'news_obi', 'news_tsuyo', 'news_fuda',
               'gaitou', 'gaitou_go', 'gaitou_sub', 'gaitou_staff', 'gaitou_obi', 'gaitou_q', 'gaitou_kado', 'tatefuda')     # バラエティの字幕型（XML だけの版でも動きなし）
-VARIETY_MOODS = ('jimaku', 'honne', 'tsumeyori', 'kyouchou', 'dokuhaku', 'narration', 'midashi', 'bara_mix', 'shuchou', 'nafuda')
+VARIETY_MOODS = ('jimaku', 'honne', 'tsumeyori', 'kyouchou', 'dokuhaku', 'narration', 'midashi', 'bara_mix', 'shuchou', 'nafuda',
+                 'kuromin', 'kokuhaku', 'mascot_name', 'mascot_title', 'side_super', 'jikanwari')
 NEWS_MOODS = ('news_jimaku', 'news_obi', 'news_kyouchou', 'news_fuda')
 KAITEN_MOODS = ('kaiten_tate', 'kaiten_yoko', 'kaiten_gin', 'kaiten_pop')
 QUIZ_MOODS = ('yontaku', 'yontaku_kin', 'mondai', 'yontaku_nhk', 'mondai_nhk')
@@ -1458,9 +1522,17 @@ VARIETY_SAMPLES = {
     'bara_mix': ([('正直 解約したい', 'k')], None),
     'shuchou': ([('集金に来る人', 'w'), ('ちょっと怖い！', 'y')], None),
     'nafuda': ([('視聴者 Aさん', 'v')], None),
+    'kuromin': ([('集金が一番キツい', 'k')], None),
+    'kokuhaku': ([('払った記憶が', 'y'), ('あんまりない', 'v')], {'記憶が': 'w'}),
+    'mascot_name': ([('今夜のゲスト', 'w'), ('元NHK職員', 'w')], None),
+    'mascot_title': ([('受信料の正体', 'y')], None),
+    'side_super': ([('元NHK職員', 'w'), ('受信料の裏を語る', 'w')], None),
+    'jikanwari': ([('出勤', 'w'), ('移動', 'k'), ('訪問・集金', 'p'), ('報告', 'o'), ('就寝', 'c')], None),
 }
 VARIETY_EXTRA = {'bara_mix': {'paint': {'正直': 'p'}, 'size_words': {'正直': .72}}, 'shuchou': {'tag': '視聴者 Aさん'},
-                 'nafuda': {'size_words': {'視聴者': .62}}}
+                 'nafuda': {'size_words': {'視聴者': .62}}, 'kokuhaku': {'sizes': [1, 1.3]},
+                 'mascot_name': {'sizes': [.5, 1], 'fonts': ['W8']},
+                 'jikanwari': {'times': ['9時', '10時', '12時', '20時', '23時', '7時']}}
 
 
 def catalog_variety(out):
@@ -1631,6 +1703,12 @@ def resolve_fx(fx):
     fo_ = fx.get('fonts')
     if fo_ is not None and not (isinstance(fo_, (list, tuple)) and all(v is None or isinstance(v, str) for v in fo_)):
         raise SystemExit('telop_fx: fonts は行ごとの書体の並び（例 ["W8"]・省いた行は型の書体。W9・W8・W7・W6・mincho・maru）')
+    tm_ = fx.get('times')
+    if tm_ is not None and not (isinstance(tm_, (list, tuple)) and all(isinstance(v, str) for v in tm_)):
+        raise SystemExit('telop_fx: times は時刻の字の並び（例 ["9時", "12時", "20時"]・時間割の区切り）')
+    wd_ = fx.get('widths')
+    if wd_ is not None and not (isinstance(wd_, (list, tuple)) and all(isinstance(v, (int, float)) and v > 0 for v in wd_)):
+        raise SystemExit('telop_fx: widths は区間の幅の比の並び（例 [4, 1, 4, 3, 2]）')
     if fx.get('tint') is not None and fx['tint'] not in BASE:
         raise SystemExit(f'telop_fx: tint の色「{fx["tint"]}」は知らない（{", ".join(BASE)}）')
     if fx.get('metal') is not None and not isinstance(fx['metal'], bool):
@@ -1799,6 +1877,8 @@ class FxTelop:
             return Yontaku(item, L, n)                 # 4択パネルも別の描き手
         if st_ == 'tatefuda':
             return TateFuda(item, L, n)                # 縦の札も別の描き手
+        if st_ == 'jikanwari':
+            return JikanWari(item, L, n)               # 時間割の帯も別の描き手
         return super().__new__(cls)
 
     def __init__(self, item, L, n, mode='chars', own_stroke=None):
@@ -2162,6 +2242,27 @@ class FxTelop:
                     d.rectangle([x0 * S, y0 * S, x1 * S, y1 * S], outline=tuple(pl['edge']) + (255,), width=max(1, int(em * .025 * S)))
             elif pl['kind'] == 'none':                          # none：台座なし（札 tag だけを出すため。スタッフの問い）
                 pass
+            elif pl['kind'] == 'divider':                       # divider：行と行の間に色の区切りの帯（右下の要点・2026-11-08）
+                cols = [tuple(c_) for c_ in (pl.get('colors') or SIDE_BAND)]
+                for ra, rb in zip(self.rows, self.rows[1:]):
+                    ya, yb = ra['base'] + .16 * ra['px'] - self.ry0, rb['base'] - .92 * rb['px'] - self.ry0
+                    ym, hh = (ya + yb) / 2, em * .14
+                    xa, xb = min(ra['x0'], rb['x0']) - self.rx0, max(ra['x1'], rb['x1']) - self.rx0
+                    e_ = em * .03
+                    d.rectangle([(xa - e_) * S, (ym - hh / 2 - e_) * S, (xb + e_) * S, (ym + hh / 2 + e_) * S], fill=(24, 16, 12, 255))
+                    seg = (xb - xa) / len(cols)
+                    for k_, c_ in enumerate(cols):
+                        sa, sb = xa + seg * k_, xa + seg * (k_ + 1)
+                        g = grad_img(img.size, [(0, lighten(c_, .25)), (1, darken(c_, .2))], (ym - hh / 2) * S, (ym + hh / 2) * S).convert('RGBA')
+                        m = Image.new('L', img.size, 0)
+                        ImageDraw.Draw(m).rectangle([sa * S, (ym - hh / 2) * S, sb * S, (ym + hh / 2) * S], fill=255)
+                        img.paste(g, (0, 0), m)
+                        xx = sa + hh * .6                         # 小さな菱形を並べる（柄の代わり）
+                        while xx < sb - hh * .4:
+                            r_ = hh * .3
+                            d.polygon([(xx * S, (ym - r_) * S), ((xx + r_) * S, ym * S), (xx * S, (ym + r_) * S), ((xx - r_) * S, ym * S)],
+                                      fill=lighten(c_, .45) + (255,))
+                            xx += hh * 1.2
             elif pl['kind'] == 'lines2':                        # lines2：字の上下に 2 本の太い線（黒い縁つき）＝速報の見出し
                 lw = max(3, int(em * .1 * S))
                 for yy in (y0, y1):
@@ -2970,6 +3071,123 @@ class TateFuda:
         return self.img.getbbox()
 
 
+# ---------------------------------------------------------------- 一日の時間割の帯（2026-11-08）
+# 行＝区間（字・色）。fx の times＝区切りの時刻（区間の数＋1 なら終わりの時刻も・区間の数なら始まりだけ）、widths＝区間の幅の比（省くと字数から）。
+# 帯はセーフティエリアの幅いっぱい、縦はテロップの高さ（spec の y）を帯の真ん中に。出方は cut（動きなし）
+JIKAN_COLORS = {'w': (246, 222, 190), 'k': (66, 66, 74), 'p': (230, 92, 156), 'o': (240, 148, 50), 'c': (64, 174, 238),
+                'y': (240, 200, 40), 'r': (214, 54, 54), 'g': (64, 170, 84), 'b': (54, 100, 210), 'v': (136, 88, 206)}
+
+
+def st_jikanwari(C, key):
+    """時間割の帯：区間の色の板（行の色）に白い字（縁は板の濃い色）・上に時刻"""
+    return dict(font='W8', fill=[(0, WHITE), (1, WHITE)])
+
+
+class JikanWari:
+    def __init__(self, item, L, n):
+        self.it, self.L, self.n = item, L, max(1, n)
+        self.W, self.H = L['W'], L['H']
+        self.fx = resolve_fx(item.get('fx') or {})
+        self.in_total = 0
+        segs = [l for l in item['lines'] if l['text'].strip()] or item['lines'][:1]
+        px = max(l['px'] for l in segs)
+        sx0, sy0, sx1, sy1 = safe_rect(L)
+        times = list(self.fx.get('times') or [])
+        ws = list(self.fx.get('widths') or [])
+        ws = [float(ws[i]) if i < len(ws) else max(2.0, len(segs[i]['text'].strip())) + 1.4 for i in range(len(segs))]
+        fr, gap = px * .09, px * .06
+        bar_w = (sx1 - sx0) - px * .3
+        bh = px * .95
+        unit = (bar_w - 2 * fr - gap * (len(segs) - 1)) / sum(ws)
+        lab = px * .6                                        # 区間の字：いちばん窮屈な区間に合わせて全部同じ大きさに
+        for l, w in zip(segs, ws):
+            tw = fx_font('W8', lab).getlength(l['text'].strip(), **FEAT)
+            room = w * unit - px * .4
+            if tw > room:
+                lab *= room / tw
+        lab = max(px * .3, lab)
+        th = px * .6 if times else 0                         # 時刻の数字の高さ（「時」は小さく）
+        total = th + (px * .14 if times else 0) + bh + 2 * fr
+        cy = sum(l['baseline'] - .38 * l['px'] for l in segs) / len(segs)
+        top = min(max(cy - total / 2, sy0 + px * .1), sy1 - total - px * .1)
+        x0 = (sx0 + sx1) / 2 - bar_w / 2
+        by0 = top + th + (px * .14 if times else 0)
+        S = 2
+        pad = max(0.0, min(px * .5, x0 - 1, top - 1))       # 落ち影の分の余白（画面の外に出さない）
+        ox, oy = x0 - pad, top - pad
+        img = Image.new('RGBA', (int((bar_w + 2 * pad) * S), int((total + 2 * pad) * S)), (0, 0, 0, 0))
+
+        def P(x, y):
+            return ((x - ox) * S, (y - oy) * S)
+        sh = Image.new('L', img.size, 0)                     # 帯の落ち影
+        ImageDraw.Draw(sh).rounded_rectangle([*P(x0 + px * .03, by0 + px * .06), *P(x0 + bar_w + px * .03, by0 + bh + 2 * fr + px * .06)],
+                                             radius=px * .06 * S, fill=140)
+        sh = sh.filter(ImageFilter.GaussianBlur(px * .06 * S))
+        img.paste(Image.new('RGBA', img.size, (0, 0, 0, 255)), (0, 0), sh)
+        d = ImageDraw.Draw(img)
+        d.rounded_rectangle([*P(x0, by0), *P(x0 + bar_w, by0 + bh + 2 * fr)], radius=px * .05 * S, fill=(226, 228, 234, 235),
+                            outline=(150, 152, 162, 255), width=max(2, int(px * .02 * S)))
+        f = fx_font('W8', lab * S)
+        xs = [x0 + fr]
+        x = x0 + fr
+        for l, w in zip(segs, ws):
+            key = l.get('color', 'w')
+            C = JIKAN_COLORS.get(key, JIKAN_COLORS['w'])
+            sw = w * unit
+            g = grad_img(img.size, [(0, lighten(C, .18)), (.5, C), (1, darken(C, .12))], P(0, by0 + fr)[1], P(0, by0 + fr + bh)[1]).convert('RGBA')
+            m = Image.new('L', img.size, 0)
+            ImageDraw.Draw(m).rectangle([*P(x, by0 + fr), *P(x + sw, by0 + fr + bh)], fill=255)
+            img.paste(g, (0, 0), m)
+            ink = (120, 96, 72) if key in ('w', 'y') else darken(C, .5)
+            d.text(P(x + sw / 2 + px * .02, by0 + fr + bh / 2 + px * .03), l['text'].strip(), font=f, fill=(0, 0, 0, 90), anchor='mm',
+                   stroke_width=int(lab * .1 * S), stroke_fill=(0, 0, 0, 90), **FEAT)
+            d.text(P(x + sw / 2, by0 + fr + bh / 2), l['text'].strip(), font=f, fill=WHITE + (255,), anchor='mm',
+                   stroke_width=max(1, int(lab * .1 * S)), stroke_fill=ink + (255,), **FEAT)
+            x += sw + gap
+            xs.append(x - gap)                                # 区間の右の端
+        bounds = [x0 + fr] + [xs[i] + gap / 2 for i in range(1, len(segs))] + [x0 + bar_w - fr]
+        if times:                                             # 時刻：区切りの上に（最初は左揃え・終わりは右揃え・ほかは中央）
+            def place(th_):
+                out_, prev = [], None
+                for i, t_ in enumerate(times[:len(bounds)]):
+                    parts = [(c_, th_ if (c_.isdigit() or c_ in ':：.') else th_ * .66) for c_ in t_]
+                    wsum = sum(fx_font('W8', z).getlength(c_, **FEAT) for c_, z in parts)
+                    bx = bounds[i]
+                    tx = bx if i == 0 else (bx - wsum if i == len(bounds) - 1 and len(times) == len(segs) + 1 else bx - wsum / 2)
+                    tx = min(max(tx, x0), x0 + bar_w - wsum)
+                    if prev is not None and tx < prev + th_ * .2:  # 隣の時刻とぶつかる
+                        return None
+                    prev = tx + wsum
+                    out_.append((tx, parts))
+                return out_
+            th2 = th
+            for _ in range(12):                               # ぶつかるなら時刻の字を小さく（区間の狭い縦の画面）
+                pos = place(th2)
+                if pos:
+                    break
+                th2 *= .9
+            base = top + th * .9
+            for tx, parts in pos or place(th2) or []:
+                for c_, z in parts:
+                    ff = fx_font('W8', z * S)
+                    d.text(P(tx, base), c_, font=ff, fill=WHITE + (255,), anchor='ls', stroke_width=max(1, int(th2 * .1 * S)),
+                           stroke_fill=(20, 20, 26, 255), **FEAT)
+                    tx += ff.getlength(c_, **FEAT) / S
+        img = img.resize((int(img.width / S), int(img.height / S)), Image.LANCZOS)
+        self.img = Image.new('RGBA', (self.W, self.H), (0, 0, 0, 0))
+        self.img.alpha_composite(img, (int(ox), int(oy)))
+        self.blank = Image.new('RGBA', (self.W, self.H), (0, 0, 0, 0))
+
+    def frame(self, f):
+        return self.img if 0 <= f < self.n else self.blank
+
+    def still(self):
+        return self.img
+
+    def rest_bbox(self):
+        return self.img.getbbox()
+
+
 # ---------------------------------------------------------------- 4択パネル（2026-11-07）
 # クイズ番組風：黒い六角の板に光る縁、左右の先から画面の端まで光る線。縦の画面向けに、問題の下へ選択肢を縦に積む。
 # 1行目＝問題、2行目から＝選択肢。fx：answer（正解の記号か番号）・pick（選んだ答え＝橙）・pick_at／reveal_at（秒）・labels・edge（縁の色）
@@ -3617,6 +3835,8 @@ def main():
     p.add_argument('--box', default=None, help='語を色の箱に「語=色,語=色」（news_jimaku の要の語）')
     p.add_argument('--sizes', default=None, help='行ごとの大きさの倍率（例 0.34,1,1,0.4。doc_title の肩書き・副題）')
     p.add_argument('--fonts', default=None, help='行ごとの書体（例 W8,,,＝1行目だけゴシック）')
+    p.add_argument('--times', default=None, help='時間割の区切りの時刻（例 9時,10時,12時,20時,23時,7時。jikanwari）')
+    p.add_argument('--widths', default=None, help='時間割の区間の幅の比（例 4,1,4,3,2。jikanwari）')
     p.add_argument('--layout', default='vertical', choices=list(LAYOUTS))
     a = ap.parse_args()
     if a.cmd == 'list':
@@ -3662,6 +3882,10 @@ def main():
         fx['sizes'] = [float(v) if v else None for v in a.sizes.split(',')]
     if a.fonts:
         fx['fonts'] = [v or None for v in a.fonts.split(',')]
+    if a.times:
+        fx['times'] = a.times.split(',')
+    if a.widths:
+        fx['widths'] = [float(v) for v in a.widths.split(',')]
     if a.glow:
         fx['glow'] = a.glow
     if a.edge:
