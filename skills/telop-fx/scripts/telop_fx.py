@@ -932,7 +932,7 @@ def st_candy(C, key):
     F = ([(0, (255, 92, 152)), (1, (234, 28, 108))] if key == 'p' else [(0, (255, 252, 254)), (1, (244, 224, 236))] if key in ('w', 'k')
          else [(0, lighten(C, .2)), (1, darken(C, .1))])
     dot = WHITE if key not in ('w', 'k') else (255, 160, 196)
-    return dict(font='maru', bold=.05, track=.03, layers=[dict(w=.2, color=_CD_NAVY)], fill=F, gloss_dots=dot,
+    return dict(font='maru', bold=.02, track=.03, layers=[dict(w=.15, color=_CD_NAVY, fill_holes=True)], fill=F, gloss_dots=dot,   # 11-09 漢字が潰れる（ユーザー）→太らせを弱め・縁を細く・穴は紺で埋める
                 extrude=dict(dx=0, dy=.12, color=_CD_TEAL), shadow=dict(dx=0, dy=.19, blur=.004, a=1.0, color=_CD_NAVY))
 
 
@@ -2601,8 +2601,8 @@ class FxTelop:
                                 if all((xx - a_) ** 2 + (yy - b_) ** 2 > gap_ * gap_ for a_, b_ in pts_):
                                     pts_.append((xx, yy))
                     dr_ = ImageDraw.Draw(img)
-                    for k_, (xx, yy) in enumerate(pts_[:2]):
-                        r1 = u.lpx * (.07 if k_ == 0 else .05)
+                    for k_, (xx, yy) in enumerate(pts_[:1]):
+                        r1 = u.lpx * .065
                         cx_, cy_ = xx + dd * 1.5, yy + dd * 1.5
                         dr_.ellipse([cx_ - r1, cy_ - r1 * .8, cx_ + r1, cy_ + r1 * .8], fill=tuple(gd_) + (235,))
                     img.putalpha(ImageChops.multiply(img.getchannel('A'), fm))
