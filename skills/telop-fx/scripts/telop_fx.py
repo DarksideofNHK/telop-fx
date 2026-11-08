@@ -1405,10 +1405,10 @@ MOODS = {
     'kuromin': ('黒い極太明朝の一言（白い太縁・画面いっぱい）', dict(style='kokuhaku', **{'in': 'cut'}, hold='none', color='k', big=True)),
     'kokuhaku': ('告白の2段（黄の太字＋紫の明朝・語の色は paint・2行目の大きさは sizes）',
                  dict(style='kokuhaku', **{'in': 'cut'}, hold='none', color='y', big=True)),
-    'mascot_name': ('隅の札・名前（左上・小さい肩書きは sizes と fonts）', dict(style='mascot', **{'in': 'cut'}, hold='none', color='w', align='l')),
+    'mascot_name': ('隅の札・名前（左上・肩書きは小さく）', dict(style='mascot', **{'in': 'cut'}, hold='none', color='w', align='l')),
     'mascot_title': ('隅の札・題名（右上・金の太ゴシック）', dict(style='mascot_kin', **{'in': 'cut'}, hold='none', color='y', align='r')),
     'side_super': ('右下の要点（2行・間に色の帯・右寄せ）', dict(style='side_super', **{'in': 'cut'}, hold='none', color='w', align='r')),
-    'jikanwari': ('一日の時間割（行＝区間・時刻は times・幅は widths）', dict(style='jikanwari', **{'in': 'cut'}, hold='none', color='w')),
+    'jikanwari': ('一日の時間割（行＝区間・時刻は times）', dict(style='jikanwari', **{'in': 'cut'}, hold='none', color='w')),
     # 街頭インタビュー風（2026-11-07）。どれも cut。要の語の色は paint、白い字幕の縁の色は edge、スタッフの札は tag
     'gaitou_aka': ('言い切りの一言（色の太明朝・赤）', dict(style='gaitou', **{'in': 'cut'}, hold='none', color='r', big=True)),
     'gaitou_ao': ('しくじった一言（色の太明朝・青）', dict(style='gaitou', **{'in': 'cut'}, hold='none', color='b', big=True)),
@@ -1751,6 +1751,16 @@ def fx_as_xml(spec):
             labs = fx.get('labels') or ['A', 'B', 'C', 'D', 'E', 'F']
             ch = [f'{labs[i]} {ln[0]}' for i, ln in enumerate(ls[1:])]
             out['lines'] = [[ls[0][0], 'w']] + [['　'.join(ch[i:i + 2]), 'y'] for i in range(0, len(ch), 2)][:2]
+        out['deco'] = None
+        out['motion'] = 'none'
+        out.setdefault('box', False)
+        return out
+    if fx['style'] == 'jikanwari':                 # 時間割の帯は XML では帯にできない＝「時刻 区間」を 3 つずつ並べた 2 行までの字（2026-11-08）
+        ls = out.get('lines') if isinstance(out.get('lines'), list) else []
+        if ls:
+            tm = list(fx.get('times') or [])
+            it = [f'{tm[i]} {ln[0]}' if i < len(tm) else str(ln[0]) for i, ln in enumerate(ls)]
+            out['lines'] = [['　'.join(it[i:i + 3]), 'w'] for i in range(0, len(it), 3)][:2]
         out['deco'] = None
         out['motion'] = 'none'
         out.setdefault('box', False)
@@ -3147,7 +3157,7 @@ class JikanWari:
             xs.append(x - gap)                                # 区間の右の端
         bounds = [x0 + fr] + [xs[i] + gap / 2 for i in range(1, len(segs))] + [x0 + bar_w - fr]
         if times:                                             # 時刻：区切りの上に（最初は左揃え・終わりは右揃え・ほかは中央）
-            def place(th_):
+            def place(th_, force=False):
                 out_, prev = [], None
                 for i, t_ in enumerate(times[:len(bounds)]):
                     parts = [(c_, th_ if (c_.isdigit() or c_ in ':：.') else th_ * .66) for c_ in t_]
@@ -3155,7 +3165,7 @@ class JikanWari:
                     bx = bounds[i]
                     tx = bx if i == 0 else (bx - wsum if i == len(bounds) - 1 and len(times) == len(segs) + 1 else bx - wsum / 2)
                     tx = min(max(tx, x0), x0 + bar_w - wsum)
-                    if prev is not None and tx < prev + th_ * .2:  # 隣の時刻とぶつかる
+                    if prev is not None and tx < prev + th_ * .2 and not force:  # 隣の時刻とぶつかる
                         return None
                     prev = tx + wsum
                     out_.append((tx, parts))
@@ -3167,7 +3177,7 @@ class JikanWari:
                     break
                 th2 *= .9
             base = top + th * .9
-            for tx, parts in pos or place(th2) or []:
+            for tx, parts in pos or place(th2, force=True):   # 縮めきっても収まらないときは重なっても描く（消さない）
                 for c_, z in parts:
                     ff = fx_font('W8', z * S)
                     d.text(P(tx, base), c_, font=ff, fill=WHITE + (255,), anchor='ls', stroke_width=max(1, int(th2 * .1 * S)),
